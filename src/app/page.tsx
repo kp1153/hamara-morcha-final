@@ -1,12 +1,12 @@
-import { Suspense } from 'react'
-import NewsDisplay from '@/components/NewsDisplay'
+'use client';
+import dynamic from 'next/dynamic';
+
+const NewsList = dynamic(() => import('./NewsList'), { ssr: false });
 
 export default function Home() {
   return (
-    <div>
-      <Suspense fallback={<div>Loading...</div>}>
-        <NewsDisplay />
-      </Suspense>
-    </div>
-  )
+    <main className="max-w-3xl mx-auto px-4 py-8">
+      <NewsList />
+    </main>
+  );
 }

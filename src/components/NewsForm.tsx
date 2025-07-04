@@ -1,201 +1,214 @@
-'use client'
-import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
+'use client';
+
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase-browser';
+
+type Category = {
+  id: number;
+  title: string;
+};
 
 export default function NewsForm() {
-  const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
-  const [category, setCategory] = useState('')
-  const [image, setImage] = useState<File | null>(null)
-  const [imageCaption, setImageCaption] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [category, setCategory] = useState<number | ''>('');
+  const [image, setImage] = useState<File | null>(null);
+  const [imageCaption, setImageCaption] = useState('');
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('id, title')
+        .order('title', { ascending: true });
+
+      if (error) {
+        alert('कैटेगरी लोड नहीं हो रही: ' + error.message);
+      } else {
+        setCategories(data || []);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setImage(e.target.files[0])
+      setImage(e.target.files[0]);
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    
-    if (!title || !content || !category) {
-      alert('शीर्षक, सामग्री और श्रेणी भरना जरूरी है')
-      setLoading(false)
-      return
+    e.preventDefault();
+    setLoading(true);
+
+    if (!title || !content || category === '') {
+      alert('शीर्षक, सामग्री और श्रेणी भरना जरूरी है');
+      setLoading(false);
+      return;
     }
 
     try {
-      let imageUrl = null
-      
-      // Upload image if selected
+      const { data: categoryCheck } = await supabase
+        .from('categories')
+        .select('id')
+        .eq('id', Number(category))
+        .single();
+
+      if (!categoryCheck) {
+        alert('चुनी गई श्रेणी मौजूद नहीं है');
+        setLoading(false);
+        return;
+      }
+
+      let imageUrl = null;
+
       if (image) {
-        const fileExt = image.name.split('.').pop()
-        const fileName = `${Math.random()}.${fileExt}`
-        const filePath = `news-images/${fileName}`
+        const fileExt = image.name.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+        const filePath = `${fileName}`;
 
         const { error: uploadError } = await supabase.storage
-          .from('news-images')
-          .upload(filePath, image)
+          .from('images')
+          .upload(filePath, image);
 
         if (uploadError) {
-          console.error('Image upload error:', uploadError)
-          alert('तस्वीर अपलोड में समस्या: ' + uploadError.message)
-          setLoading(false)
-          return
+          alert('तस्वीर अपलोड में समस्या: ' + uploadError.message);
+          setLoading(false);
+          return;
         }
 
-        // Get public URL
-        const { data: { publicUrl } } = supabase.storage
-          .from('news-images')
-          .getPublicUrl(filePath)
-        
-        imageUrl = publicUrl
+        const { data: publicData } = supabase.storage
+          .from('images')
+          .getPublicUrl(filePath);
+
+        imageUrl = publicData.publicUrl;
       }
 
-      // Insert news article
-      const { data, error } = await supabase
-        .from('news_articles')
-        .insert([{ 
-          title, 
-          content, 
-          category,
+      const slug = (
+        title
+          .toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^a-z0-9\-]/g, '')
+        + '-' + Date.now()
+      );
+
+      const currentDate = new Date().toISOString();
+
+      const { error } = await supabase.from('news_articles').insert([
+        {
+          title,
+          content,
+          category_id: Number(category),
           image_url: imageUrl,
           image_caption: imageCaption || null,
-          created_at: new Date().toISOString()
-        }])
-        
+          slug,
+          created_at: currentDate,
+          published_at: currentDate, // ✅ यह लाइन जोड़ दी गई है
+        },
+      ]);
+
       if (error) {
-        console.error('Full Error:', error)
-        alert('खबर अपलोड में समस्या: ' + (error.message || 'अज्ञात त्रुटि'))
-      } else {
-        console.log('Success:', data)
-        alert('खबर सफलतापूर्वक अपलोड हो गई!')
-        // Clear form
-        setTitle('')
-        setContent('')
-        setCategory('')
-        setImage(null)
-        setImageCaption('')
-        // Reset file input
-        const fileInput = document.getElementById('image-input') as HTMLInputElement
-        if (fileInput) fileInput.value = ''
+        throw error;
       }
-    } catch (error) {
-      console.error('Unexpected error:', error)
-      alert('कुछ गलत हुआ है')
+
+      alert('✅ खबर सफलतापूर्वक सेव हो गई!');
+      setTitle('');
+      setContent('');
+      setCategory('');
+      setImage(null);
+      setImageCaption('');
+      const fileInput = document.getElementById('image-input') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
+
+    } catch (error: any) {
+      alert('खबर अपलोड में समस्या: ' + error.message);
     }
-    
-    setLoading(false)
-  }
+
+    setLoading(false);
+  };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+    <div className="max-w-2xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-6">
       <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-        📰 नई खबर अपलोड करें
+        📰 नई खबर जोड़ें
       </h2>
-      
+
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Title */}
         <div>
-          <label className="block text-lg font-semibold text-gray-700 mb-2">
-            शीर्षक (Headline)
-          </label>
+          <label className="block text-lg font-semibold mb-2">शीर्षक</label>
           <input
             type="text"
-            placeholder="खबर का मुख्य शीर्षक लिखें..."
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            className="w-full px-4 py-2 border rounded"
             required
-            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-2xl font-bold"
           />
         </div>
 
-        {/* Content */}
         <div>
-          <label className="block text-lg font-semibold text-gray-700 mb-2">
-            सामग्री (Content)
-          </label>
+          <label className="block text-lg font-semibold mb-2">सामग्री</label>
           <textarea
-            placeholder="पूरी खबर यहाँ लिखें..."
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            rows={8}
+            rows={6}
+            className="w-full px-4 py-2 border rounded"
             required
-            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg leading-relaxed"
           />
         </div>
 
-        {/* Category */}
         <div>
-          <label className="block text-lg font-semibold text-gray-700 mb-2">
-            श्रेणी (Category)
-          </label>
-          <select 
-            value={category} 
-            onChange={(e) => setCategory(e.target.value)}
+          <label className="block text-lg font-semibold mb-2">श्रेणी</label>
+          <select
+            value={category}
+            onChange={(e) => setCategory(Number(e.target.value))}
+            className="w-full px-4 py-2 border rounded"
             required
-            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
           >
             <option value="">श्रेणी चुनें</option>
-            <option value="desh-videsh">देश-विदेश</option>
-            <option value="vividha">विविध</option>
-            <option value="aalekh">आलेख</option>
-            <option value="pratirodh">प्रतिरोध</option>
-            <option value="lifestyle">लाइफ-स्टाइल</option>
-            <option value="tech-world">टेक-वर्ल्ड</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.title}
+              </option>
+            ))}
           </select>
         </div>
 
-        {/* Image Upload */}
         <div>
-          <label className="block text-lg font-semibold text-gray-700 mb-2">
-            📸 तस्वीर (Image) - वैकल्पिक
-          </label>
+          <label className="block text-lg font-semibold mb-2">तस्वीर (वैकल्पिक)</label>
           <input
-            type="file"
             id="image-input"
+            type="file"
             accept="image/*"
             onChange={handleImageChange}
-            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+            className="w-full px-4 py-2 border rounded"
           />
-          {image && (
-            <p className="text-sm text-green-600 mt-2">
-              ✅ चुनी गई फाइल: {image.name}
-            </p>
-          )}
         </div>
 
-        {/* Image Caption */}
         {image && (
           <div>
-            <label className="block text-lg font-semibold text-gray-700 mb-2">
-              तस्वीर का कैप्शन (Image Caption)
-            </label>
+            <label className="block text-lg font-semibold mb-2">तस्वीर का कैप्शन</label>
             <input
               type="text"
-              placeholder="तस्वीर के बारे में संक्षिप्त विवरण..."
               value={imageCaption}
               onChange={(e) => setImageCaption(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+              className="w-full px-4 py-2 border rounded"
             />
           </div>
         )}
 
-        {/* Submit Button */}
-        <button 
+        <button
           type="submit"
           disabled={loading}
-          className={`w-full py-4 px-6 rounded-lg text-white text-lg font-semibold transition-all ${
-            loading 
-              ? 'bg-gray-400 cursor-not-allowed' 
-              : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg transform hover:scale-105'
+          className={`w-full py-3 rounded text-white font-semibold transition ${
+            loading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'
           }`}
         >
-          {loading ? '⏳ अपलोड हो रहा है...' : '📤 खबर अपलोड करें'}
+          {loading ? 'अपलोड हो रहा है...' : '📤 खबर अपलोड करें'}
         </button>
       </form>
     </div>
-  )
+  );
 }

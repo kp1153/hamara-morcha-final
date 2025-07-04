@@ -1,182 +1,91 @@
-'use client'
-import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+'use client';
 
-interface NewsArticle {
-  id: number
-  title: string
-  content: string
-  category: string
-  image_url: string | null
-  image_caption: string | null
-  created_at: string
-}
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { supabase } from '@/lib/supabase-browser';
 
-export default function DeshVideshPage() {
-  const [news, setNews] = useState<NewsArticle[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [isAdmin, setIsAdmin] = useState(false)
+type Article = {
+  id: number;
+  title: string;
+  content: string;
+  slug: string;
+  published_at: string;
+  image_url?: string;
+  image_caption?: string;
+};
+
+export default function DeshVideshDetailPage() {
+  const { slug } = useParams();
+  const [article, setArticle] = useState<Article | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    checkAdminStatus()
-    fetchNews()
-  }, [])
+    const fetchArticle = async () => {
+      if (!slug || typeof slug !== 'string') {
+        setError('Slug अमान्य है');
+        setLoading(false);
+        return;
+      }
 
-  const checkAdminStatus = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    setIsAdmin(!!user)
-  }
-
-  const fetchNews = async () => {
-    try {
-      console.log('Fetching desh-videsh news...')
       const { data, error } = await supabase
         .from('news_articles')
         .select('*')
-        .eq('category', 'desh-videsh')
-        .order('created_at', { ascending: false })
+        .eq('slug', slug)
+        .single();
 
       if (error) {
-        console.error('Database error:', error)
-        setError('न्यूज़ लोड करने में समस्या: ' + error.message)
+        setError('खबर लोड करने में समस्या: ' + error.message);
+        setArticle(null);
       } else {
-        console.log('Desh-videsh news fetched:', data)
-        setNews(data || [])
-        setError(null)
+        setArticle(data);
+        setError(null);
       }
-    } catch (err) {
-      console.error('Error fetching desh-videsh news:', err)
-      setError('कुछ गलत हुआ है')
-    } finally {
-      setLoading(false)
-    }
-  }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('hi-IN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
+      setLoading(false);
+    };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('क्या आप वाकई इस खबर को हटाना चाहते हैं?')) return
+    fetchArticle();
+  }, [slug]);
 
-    const { error } = await supabase
-      .from('news_articles')
-      .delete()
-      .eq('id', id)
+  if (loading) return <div className="p-4">⏳ खबर लोड हो रही है...</div>;
 
-    if (error) {
-      alert('हटाने में समस्या: ' + error.message)
-    } else {
-      alert('खबर हटा दी गई!')
-      fetchNews() // Refresh the list
-    }
-  }
-
-  if (loading) {
+  if (error)
     return (
-      <div className="flex justify-center items-center py-12">
-        <div className="text-xl">⏳ देश-विदेश की खबरें लोड हो रही हैं...</div>
+      <div className="text-red-600 font-semibold p-4">
+        ❌ {error}
       </div>
-    )
-  }
+    );
 
-  if (error) {
+  if (!article)
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-        {error}
+      <div className="text-gray-600 font-medium p-4">
+        ⚠️ कोई खबर नहीं मिली।
       </div>
-    )
-  }
-
-  if (news.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <h1 className="text-4xl font-bold text-gray-800 mb-4">🌍 देश-विदेश</h1>
-        <div className="text-xl text-gray-600">इस कैटेगरी में अभी तक कोई समाचार नहीं है</div>
-      </div>
-    )
-  }
+    );
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-4">🌍 देश-विदेश</h1>
-        {isAdmin && (
-          <div className="text-sm text-green-600 font-semibold mb-4">
-            ✅ Admin Mode Active
-          </div>
-        )}
-        <div className="text-sm text-gray-500">
-          Total Articles: {news.length}
+    <main className="max-w-3xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-4">{article.title}</h1>
+
+      {article.published_at && (
+        <p className="text-sm text-gray-500 mb-2">
+          🗓️ {new Date(article.published_at).toLocaleDateString()}
+        </p>
+      )}
+
+      {article.image_url && (
+        <div className="my-4">
+          <img src={article.image_url} alt={article.image_caption || 'तस्वीर'} className="w-full rounded-md" />
+          {article.image_caption && (
+            <p className="text-sm text-gray-500 mt-1">{article.image_caption}</p>
+          )}
         </div>
-      </div>
-      
-      <div className="space-y-8">
-        {news.map((article) => (
-          <article key={article.id} className="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
-            {/* Category Badge */}
-            <div className="p-4 pb-2">
-              <span className="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
-                देश-विदेश
-              </span>
-            </div>
+      )}
 
-            {/* Image */}
-            {article.image_url && (
-              <div className="px-4">
-                <div className="relative w-full h-80 bg-gray-100 rounded-lg overflow-hidden">
-                  <img 
-                    src={article.image_url} 
-                    alt={article.image_caption || article.title}
-                    className="w-full h-full object-contain"
-                    style={{ objectFit: 'contain' }}
-                  />
-                </div>
-                {article.image_caption && (
-                  <p className="text-sm text-gray-600 mt-2 italic">
-                    📸 {article.image_caption}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* Content */}
-            <div className="p-4">
-              <h2 className="text-3xl font-bold text-gray-900 mb-3 leading-tight">
-                {article.title}
-              </h2>
-              
-              <div className="text-lg text-gray-700 leading-relaxed mb-4 whitespace-pre-wrap">
-                {article.content}
-              </div>
-
-              {/* Date and Admin Controls */}
-              <div className="flex justify-between items-center text-sm text-gray-500 border-t pt-3">
-                <span>📅 {formatDate(article.created_at)}</span>
-                <div className="flex items-center gap-2">
-                  <span>ID: {article.id}</span>
-                  {isAdmin && (
-                    <button
-                      onClick={() => handleDelete(article.id)}
-                      className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600 ml-2"
-                    >
-                      🗑️ Delete
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
-    </div>
-  )
+      <article className="text-lg text-gray-800 leading-relaxed whitespace-pre-line">
+        {article.content}
+      </article>
+    </main>
+  );
 }
