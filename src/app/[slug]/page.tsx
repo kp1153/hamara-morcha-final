@@ -1,13 +1,5 @@
 import { supabase } from '@/lib/supabase-browser';
 
-type NewsArticle = {
-  id: number;
-  title: string;
-  content: string;
-  slug: string;
-  created_at: string;
-};
-
 export default async function NewsDetail({ params }: { params: { slug: string } }) {
   const { data, error } = await supabase
     .from('news_articles')
