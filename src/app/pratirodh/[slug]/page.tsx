@@ -5,9 +5,8 @@ import { fetchNewsBySlugAndCategory } from '@/lib/newsService';
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
- const news = await fetchNewsBySlugAndCategory(slug, 'देश-विदेश');
-if (!news) notFound();
- 
+  const news = await fetchNewsBySlugAndCategory(slug, 'प्रतिरोध');
+  if (!news) notFound();
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return '';
@@ -37,17 +36,24 @@ if (!news) notFound();
               {formatDate(news.created_at)}
             </div>
           </div>
-          <p className="text-sm text-gray-500 mb-4"></p>
+          
           {news.image_url && (
             <div className="mb-6">
               <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden">
-                <Image src={news.image_url.trimEnd()} alt={news.title} fill className="object-cover" priority />
+                <Image 
+                  src={news.image_url.trimEnd()} 
+                  alt={news.title} 
+                  fill 
+                  className="object-cover" 
+                  priority 
+                />
               </div>
               {news.caption && (
                 <p className="text-sm text-gray-600 mt-2 text-center italic">{news.caption}</p>
               )}
             </div>
           )}
+          
           <div className="text-gray-800 leading-relaxed text-base md:text-lg whitespace-pre-wrap">
             {news.content}
           </div>

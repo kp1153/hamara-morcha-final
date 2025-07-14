@@ -1,79 +1,60 @@
-'use client'
+'use client';
+import Image from 'next/image';
 
-export default function TeamPage() {
+const teamMembers = [
+  {
+    id: 1,
+    name: 'माननीय चीकू सिंह बुंदेला उर्फ दीवान जी',
+    role: 'संरक्षक',
+    photo: '/images/1.jpg',
+  },
+  {
+    id: 2,
+    name: 'दिगंत शुक्ल',
+    role: 'प्रधान संपादक',
+    photo: '/images/2.jpg',
+  },
+  {
+    id: 3,
+    name: 'अद्वय शुक्ल',
+    role: 'संपादक',
+    photo: '/images/3.jpg',
+  },
+  {
+    id: 4,
+    name: 'कामता प्रसाद',
+    role: 'कार्यकारी संपादक',
+    photo: '/images/4.jpg',
+  },
+  {
+    id: 5,
+    name: 'अन्य सदस्य',
+    role: '',
+    photo: '/images/5.jpg',
+  },
+];
+
+export default function Team() {
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-4">👥 हमारी टीम</h1>
-      </div>
-
-      {/* संरक्षक */}
-      <div className="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200 mb-6">
-        <div className="p-6">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full mx-auto flex items-center justify-center text-white text-2xl font-bold mb-4">
-              सं
+    <div className="max-w-5xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8 text-center">टीम</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+        {teamMembers.map(({ id, name, role, photo }) => (
+          <div key={id} className="bg-gray-800 rounded-lg p-4 text-center text-white shadow-lg">
+            <div className="w-40 h-40 mx-auto mb-4 relative">
+              <Image
+                src={photo}
+                alt={name}
+                fill
+                style={{ objectFit: 'cover', borderRadius: '0.5rem' }}
+                priority={true}
+              />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">
-              संरक्षक
-            </h2>
-            <h3 className="text-xl font-semibold text-purple-600">
-              चीकू सिंह बुंदेला उर्फ दीवान जी
-            </h3>
+            <h2 className="text-xl font-semibold">{name}</h2>
+            {role && <p className="text-blue-400 mt-1">{role}</p>}
           </div>
-        </div>
-      </div>
-
-      {/* प्रधान संपादक */}
-      <div className="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200 mb-6">
-        <div className="p-6">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-gradient-to-br from-red-500 to-orange-600 rounded-full mx-auto flex items-center justify-center text-white text-2xl font-bold mb-4">
-              प्र
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">
-              प्रधान संपादक
-            </h2>
-            <h3 className="text-xl font-semibold text-red-600">
-              दिगंत शुक्ला
-            </h3>
-          </div>
-        </div>
-      </div>
-
-      {/* संपादक */}
-      <div className="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200 mb-6">
-        <div className="p-6">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-teal-600 rounded-full mx-auto flex items-center justify-center text-white text-2xl font-bold mb-4">
-              सं
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">
-              संपादक
-            </h2>
-            <h3 className="text-xl font-semibold text-green-600">
-              अद्वय शुक्ला
-            </h3>
-          </div>
-        </div>
-      </div>
-
-      {/* कार्यकारी संपादक */}
-      <div className="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200 mb-8">
-        <div className="p-6">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full mx-auto flex items-center justify-center text-white text-2xl font-bold mb-4">
-              का
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">
-              कार्यकारी संपादक
-            </h2>
-            <h3 className="text-xl font-semibold text-blue-600">
-              कामता प्रसाद
-            </h3>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
-  )
+  );
 }
