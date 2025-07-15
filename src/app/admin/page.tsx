@@ -71,7 +71,7 @@ export default function AdminPage() {
         }
       }
 
-      const { data, error } = await createNews({
+      const { error } = await createNews({
         title,
         content,
         category,
