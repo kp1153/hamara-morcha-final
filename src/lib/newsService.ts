@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient';
-import { generateSimpleSlug } from './slugGenerator'; // यह लाइन आपकी फाइल में थी और यह बनी रहेगी ✅
+import { generateSimpleSlug } from './slugGenerator'; // यह लाइन बनी रहेगी ✅
 
 export interface NewsItem {
   id: string;
@@ -55,12 +55,13 @@ export async function deleteNews(id: string) {
   return { error };
 }
 
-+ export async function updateNews(id: string, updates: Partial<NewsItem>) {
-+   const { data, error } = await supabase
-+     .from('news')
-+     .update(updates)
-+     .eq('id', id)
-+     .single();
-+ 
-+   return { data, error };
-+ }
+// ✅ यह है अपडेट (U) ऑपरेशन का सही और सिंटेक्स-क्लीन वर्ज़न
+export async function updateNews(id: string, updates: Partial<NewsItem>) {
+  const { data, error } = await supabase
+    .from('news')
+    .update(updates)
+    .eq('id', id)
+    .single();
+
+  return { data, error };
+}
