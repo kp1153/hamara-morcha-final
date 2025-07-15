@@ -3,6 +3,8 @@ import { useUser, SignInButton, SignOutButton } from '@clerk/nextjs';
 import { useState, useEffect } from 'react';
 import { createNews, getAllNews, deleteNews, NewsItem } from '@/lib/newsService';
 import { uploadImageAndGetURL } from '@/lib/uploadImage';
+import Image from 'next/image';
+
 
 const ADMIN_EMAIL = 'prasad.kamta@gmail.com';
 
@@ -96,7 +98,11 @@ export default function AdminPage() {
         loadPosts();
       }
     } catch (err) {
-      setMessage(`Error: ${err.message}`);
+      if (err instanceof Error) {
+        setMessage(`Error: ${err.message}`);
+      } else {
+        setMessage('An unknown error occurred');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -281,7 +287,7 @@ export default function AdminPage() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 />
                 {imageUrl && (
-                  <img src={imageUrl} alt="Preview" className="mt-2 h-32 object-cover rounded" />
+                  <Image src={imageUrl} alt="Preview" className="mt-2 h-32 object-cover rounded" />
                 )}
               </div>
 
