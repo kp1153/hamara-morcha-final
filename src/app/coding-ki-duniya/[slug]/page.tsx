@@ -36,16 +36,15 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
               {formatDate(news.created_at)}
             </div>
           </div>
-          
           {news.image_url && (
             <div className="mb-6">
               <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden">
-                <Image 
-                  src={news.image_url.trimEnd()} 
-                  alt={news.title} 
-                  fill 
-                  className="object-cover" 
-                  priority 
+                <Image
+                  src={news.image_url.trimEnd()}
+                  alt={news.title}
+                  fill
+                  className="object-cover"
+                  priority
                 />
               </div>
               {news.caption && (
@@ -53,7 +52,6 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
               )}
             </div>
           )}
-          
           <div className="text-gray-800 leading-relaxed text-base md:text-lg whitespace-pre-wrap">
             {news.content}
           </div>
