@@ -28,7 +28,9 @@ export default async function JeevanKeRangPage() {
                   className="rounded-lg object-cover w-full"
                 />
                 {item.caption && (
-                  <p className="text-sm text-gray-600 mt-1 text-center italic">{item.caption}</p>
+                  <p className="text-sm text-gray-600 mt-1 text-center italic">
+                    {item.caption}
+                  </p>
                 )}
               </div>
             )}
