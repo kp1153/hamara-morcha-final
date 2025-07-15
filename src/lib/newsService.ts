@@ -1,5 +1,5 @@
-import { supabase } from './supabaseClient';
-import { generateSimpleSlug } from './slugGenerator'; // यह लाइन बनी रहेगी ✅
+// ✅ फाइल: src/lib/newsService.ts
+import supabase from './supabaseClient';
 
 export interface NewsItem {
   id: string;
@@ -10,15 +10,18 @@ export interface NewsItem {
   caption?: string;
   published: boolean;
   created_at: string;
+  slug: string;
 }
 
+// ✅ Create
 export async function createNews(news: Omit<NewsItem, 'id' | 'created_at'>) {
   const { data, error } = await supabase.from('news').insert([news]).single();
   return { data, error };
 }
 
-export async function getAllNews() {
-  const { data, error } = await supabase
+// ✅ Read All - Return type specified
+export async function getAllNews(): Promise<NewsItem[]> {
+  const { data } = await supabase
     .from('news')
     .select('*')
     .order('created_at', { ascending: false });
@@ -26,11 +29,12 @@ export async function getAllNews() {
   return data || [];
 }
 
+// ✅ Read by Slug & Category - Return type specified
 export async function fetchNewsBySlugAndCategory(
   slug: string,
   category: string
-) {
-  const { data, error } = await supabase
+): Promise<NewsItem | null> {
+  const { data } = await supabase
     .from('news')
     .select('*')
     .eq('category', category)
@@ -40,22 +44,25 @@ export async function fetchNewsBySlugAndCategory(
   return data;
 }
 
-export async function getNewsByCategory(category: string) {
-  const { data, error } = await supabase
+// ✅ Read by Category - Return type specified
+export async function getNewsByCategory(category: string): Promise<NewsItem[]> {
+  const { data } = await supabase
     .from('news')
     .select('*')
     .eq('category', category)
+    .eq('published', true) // Only published posts
     .order('created_at', { ascending: false });
 
   return data || [];
 }
 
+// ✅ Delete
 export async function deleteNews(id: string) {
   const { error } = await supabase.from('news').delete().eq('id', id);
   return { error };
 }
 
-// ✅ यह है अपडेट (U) ऑपरेशन का सही और सिंटेक्स-क्लीन वर्ज़न
+// ✅ Update
 export async function updateNews(id: string, updates: Partial<NewsItem>) {
   const { data, error } = await supabase
     .from('news')

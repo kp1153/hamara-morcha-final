@@ -17,7 +17,7 @@ export default async function DeshVideshPage() {
                 {item.title}
               </h2>
             </Link>
-            
+
             {item.image_url && (
               <div className="my-3">
                 <Image
@@ -28,11 +28,13 @@ export default async function DeshVideshPage() {
                   className="rounded-lg object-cover w-full"
                 />
                 {item.caption && (
-                  <p className="text-sm text-gray-600 mt-1 text-center italic">{item.caption}</p>
+                  <p className="text-sm text-gray-600 mt-1 text-center italic">
+                    {item.caption}
+                  </p>
                 )}
               </div>
             )}
-            
+
             <p className="mt-2 text-blue-700">{item.content}</p>
           </li>
         ))}

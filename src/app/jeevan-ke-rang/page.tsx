@@ -17,7 +17,7 @@ export default async function JeevanKeRangPage() {
                 {item.title}
               </h2>
             </Link>
-            
+
             {item.image_url && (
               <div className="my-3">
                 <Image
@@ -34,7 +34,7 @@ export default async function JeevanKeRangPage() {
                 )}
               </div>
             )}
-            
+
             <p className="mt-2 text-blue-700">{item.content}</p>
           </li>
         ))}
