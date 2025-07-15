@@ -1,4 +1,3 @@
-// lib/slugGenerator.ts
 import supabase from './supabaseClient';
 
 // Simple Hindi to Roman converter
@@ -111,3 +110,6 @@ export async function generateSimpleSlug(title: string): Promise<string> {
   // If somehow timestamp slug exists, use database check method
   return await generateUniqueSlugWithCheck(title);
 }
+
+// ✅ Add this final line so `generateSlug` becomes available:
+export { generateSimpleSlug as generateSlug };
