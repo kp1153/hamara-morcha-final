@@ -1,5 +1,6 @@
 'use client'
-import { useUser, SignInButton, SignOutButton } from '@clerk/nextjs'
+
+import { useUser, SignInButton } from '@clerk/nextjs'
 import { useState, useEffect, useRef } from 'react'
 import { createNews, getAllNews, deleteNews, updateNews } from '@/lib/newsService'
 import { uploadImageAndGetURL } from '@/lib/uploadImage'
@@ -27,8 +28,6 @@ export default function AdminDashboardPage() {
     image: null,
     category: CATEGORIES[0].value,
     status: 'draft',
-    metaTitle: '',
-    metaDescription: ''
   })
 
   useEffect(() => {
@@ -42,45 +41,39 @@ export default function AdminDashboardPage() {
       image: null,
       category: CATEGORIES[0].value,
       status: 'draft',
-      metaTitle: '',
-      metaDescription: ''
     })
     setEditingId(null)
   }
 
-
-  
   const handleSubmit = async (e) => {
-  e.preventDefault()
-  setIsLoading(true)
-  try {
-    const imageUrl = formData.image ? await uploadImageAndGetURL(formData.image) : null
-    const slug = await generateSlug(formData.title) // ✅ यहीं fix है
+    e.preventDefault()
+    setIsLoading(true)
+    try {
+      const imageUrl = formData.image ? await uploadImageAndGetURL(formData.image) : null
+      const slug = await generateSlug(formData.title)
 
-    const newsItem = {
-      ...formData,
-      image_url: imageUrl,
-      slug, // ✅ अब ये string है, Promise नहीं
-      published_at: formData.status === 'published' ? new Date() : null,
-     published: formData.status === 'published'      
+      const newsItem = {
+        ...formData,
+        image_url: imageUrl,
+        slug,
+        published_at: formData.status === 'published' ? new Date() : null,
+        published: formData.status === 'published',
+      }
+
+      if (editingId) {
+        await updateNews(editingId, newsItem)
+      } else {
+        await createNews(newsItem)
+      }
+
+      setNews(await getAllNews())
+      resetForm()
+    } catch (err) {
+      console.error('Error:', err)
+    } finally {
+      setIsLoading(false)
     }
-
-    if (editingId) {
-      await updateNews(editingId, newsItem)
-    } else {
-      await createNews(newsItem)
-    }
-
-    setNews(await getAllNews())
-    resetForm()
-  } catch (err) {
-    console.error('Error:', err)
-  } finally {
-    setIsLoading(false)
   }
-}
-
-
 
   const handleEdit = (post) => {
     setFormData({
@@ -89,8 +82,6 @@ export default function AdminDashboardPage() {
       image: null,
       category: post.category,
       status: post.status,
-      metaTitle: post.meta_title || '',
-      metaDescription: post.meta_description || ''
     })
     setEditingId(post.id)
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -122,6 +113,7 @@ export default function AdminDashboardPage() {
       {/* FORM */}
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow space-y-4">
         <h2 className="text-2xl font-semibold">{editingId ? 'Edit Post' : 'Create New Post'}</h2>
+
         <input
           type="text"
           placeholder="Title"
@@ -137,6 +129,18 @@ export default function AdminDashboardPage() {
           value={formData.content}
           onChange={(e) => setFormData({ ...formData, content: e.target.value })}
         />
+
+        <select
+          className="border p-2 rounded w-full"
+          value={formData.category}
+          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+        >
+          {CATEGORIES.map((cat) => (
+            <option key={cat.value} value={cat.value}>
+              {cat.label}
+            </option>
+          ))}
+        </select>
 
         <div
           className="border-2 border-dashed p-4 text-center rounded"
@@ -179,23 +183,6 @@ export default function AdminDashboardPage() {
               }
             }}
             accept="image/*"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <input
-            type="text"
-            placeholder="Meta Title"
-            className="w-full border p-2 rounded"
-            value={formData.metaTitle}
-            onChange={(e) => setFormData({ ...formData, metaTitle: e.target.value })}
-          />
-          <textarea
-            placeholder="Meta Description"
-            className="w-full border p-2 rounded"
-            rows={3}
-            value={formData.metaDescription}
-            onChange={(e) => setFormData({ ...formData, metaDescription: e.target.value })}
           />
         </div>
 
