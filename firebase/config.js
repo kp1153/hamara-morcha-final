@@ -4,7 +4,7 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
-// 🔑 Firebase config — आपकी असली values
+// 🔑 Hard-coded Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyCdvdqty3z06UQ5IeCwm2dzlkiYj1sa6pc",
   authDomain: "morcha-live.firebaseapp.com",
@@ -22,12 +22,6 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-/**
- * 🔑 Firebase Login Function
- * @param {string} email
- * @param {string} password
- * @returns {Promise<UserCredential>}
- */
 export async function firebaseLogin(email, password) {
   try {
     return await signInWithEmailAndPassword(auth, email, password);

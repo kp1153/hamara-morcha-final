@@ -3,7 +3,6 @@ import Image from "next/image";
 import { getNewsByCategory } from "@/lib/newsService";
 
 export default async function JeevanKeRangPage() {
-  // "जीवन के रंग" कैटेगरी वाली पोस्टें सीधे लाओ
   const posts = await getNewsByCategory("जीवन के रंग");
 
   return (
@@ -18,15 +17,17 @@ export default async function JeevanKeRangPage() {
               </h2>
             </Link>
 
-            {item.image_url && (
+            {/* ✅ Fixed image display */}
+            {item.images && item.images.length > 0 && (
               <div className="my-3">
                 <Image
-                  src={item.image_url}
+                  src={item.images[0]}
                   alt={item.title}
                   width={600}
                   height={300}
                   className="rounded-lg object-cover w-full"
                 />
+                {/* ✅ Caption only if exists */}
                 {item.caption && (
                   <p className="text-sm text-gray-600 mt-1 text-center italic">
                     {item.caption}
