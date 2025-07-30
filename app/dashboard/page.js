@@ -97,6 +97,15 @@ export default function AdminDashboard() {
 
     setUploading(true);
 
+    // Slug generate करें
+    const generateSlug = (title) => {
+      return title
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .trim();
+    };
+
     let uploadedImageUrls = [];
 
     if (selectedImages.length > 0) {
@@ -109,6 +118,7 @@ export default function AdminDashboard() {
     try {
       const newsData = {
         title: newsForm.title,
+        slug: generateSlug(newsForm.title),
         content: newsForm.content,
         category: newsForm.category,
         caption: newsForm.caption,
@@ -117,6 +127,7 @@ export default function AdminDashboard() {
         status: "published",
         createdAt: new Date().toISOString(),
         images: uploadedImageUrls,
+        image_url: uploadedImageUrls.length > 0 ? uploadedImageUrls[0] : null,
       };
 
       if (editingNews) {
