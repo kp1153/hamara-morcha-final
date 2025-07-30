@@ -1,103 +1,85 @@
+"use client";
+
+import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { getAllNews } from "../lib/newsService";
 
-export default function Home() {
+export default function HomePage() {
+  const [news, setNews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const getCategoryPath = (category) => {
+    const categoryMap = {
+      "देश-विदेश": "desh-videsh",
+      "जीवन के रंग": "jeevan-ke-rang",
+      "कोडिंग की दुनिया": "coding-ki-duniya",
+      प्रतिरोध: "pratirodh",
+    };
+    return categoryMap[category] || category;
+  };
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const data = await getAllNews();
+        setNews(data);
+        setError(null);
+      } catch (err) {
+        setError("Error loading news: " + (err?.message || "Unknown error"));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNews();
+  }, []);
+
+  if (loading) return null;
+  if (error) return null;
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <main className="p-4 max-w-3xl mx-auto space-y-6">
+      {news.map((item) => (
+        <div
+          key={item.id}
+          className="bg-white p-4 rounded shadow border border-gray-200"
+        >
+          <div className="flex items-center mb-3">
+            <span className="bg-red-50 text-red-700 border border-red-200 px-3 py-1 rounded-full text-sm font-medium">
+              {item.category}
+            </span>
+            <span className="ml-4 text-sm text-gray-600">
+              🕐 {new Date(item.created_at).toLocaleString("hi-IN")}
+            </span>
+          </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          <Link href={`/${getCategoryPath(item.category)}/${item.slug}`}>
+            <h2 className="text-xl font-bold text-blue-800 hover:underline mb-3">
+              {item.title}
+            </h2>
+          </Link>
+
+          {item.image_url && (
+            <div className="mb-4">
+              <Image
+                src={item.image_url}
+                alt={item.title}
+                width={400}
+                height={200}
+                className="rounded-lg object-cover"
+              />
+            </div>
+          )}
+
+          {item.content && (
+            <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+              {item.content.substring(0, 200)}...
+            </p>
+          )}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      ))}
+    </main>
   );
 }
