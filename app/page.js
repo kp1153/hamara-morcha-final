@@ -50,6 +50,8 @@ export default function HomePage() {
             <span className="bg-red-50 text-red-700 border border-red-200 px-3 py-1 rounded-full text-sm font-medium">
               {item.category}
             </span>
+            {console.log("Item data:", JSON.stringify(item))}
+
             <span className="ml-4 text-sm text-gray-600">
               🕐 {new Date(item.created_at).toLocaleString("hi-IN")}
             </span>
