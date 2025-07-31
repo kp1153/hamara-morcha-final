@@ -58,9 +58,10 @@ export default async function Page({ params }) {
               )}
             </div>
           )}
-          <div className="text-gray-800 leading-relaxed text-base md:text-lg whitespace-pre-wrap">
-            {news.content}
-          </div>
+         <div 
+  className="text-gray-800 leading-relaxed text-base md:text-lg"
+  dangerouslySetInnerHTML={{ __html: news.content }}
+/>
         </div>
       </div>
     </main>

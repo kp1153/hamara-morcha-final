@@ -23,7 +23,7 @@ export default async function Page({ params }) {
 
   return (
     <main className="min-h-screen bg-gray-50">
-    <NewsAnalytics newsData={news} />
+      <NewsAnalytics newsData={news} />
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex items-center mb-4">
@@ -58,9 +58,11 @@ export default async function Page({ params }) {
               )}
             </div>
           )}
-          <div className="text-gray-800 leading-relaxed text-base md:text-lg whitespace-pre-wrap">
-            {news.content}
-          </div>
+
+          <div
+            className="text-gray-800 leading-relaxed text-base md:text-lg"
+            dangerouslySetInnerHTML={{ __html: news.content }}
+          />
         </div>
       </div>
     </main>
