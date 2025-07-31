@@ -1,27 +1,29 @@
-import { notFound } from 'next/navigation';
-import Image from 'next/image';
-import { fetchNewsBySlugAndCategory } from '@/lib/newsService';
+import { notFound } from "next/navigation";
+import NewsAnalytics from "@/components/NewsAnalytics";
+import Image from "next/image";
+import { fetchNewsBySlugAndCategory } from "@/lib/newsService";
 
 export default async function Page({ params }) {
   const { slug } = await params;
 
-  const news = await fetchNewsBySlugAndCategory(slug, 'कोडिंग की दुनिया');
+  const news = await fetchNewsBySlugAndCategory(slug, "कोडिंग की दुनिया");
   if (!news) notFound();
 
   const formatDate = (dateString) => {
-    if (!dateString) return '';
+    if (!dateString) return "";
     const date = new Date(dateString);
-    return date.toLocaleDateString('hi-IN', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    return date.toLocaleDateString("hi-IN", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   return (
     <main className="min-h-screen bg-gray-50">
+    <NewsAnalytics newsData={news} />
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex items-center mb-4">
@@ -29,7 +31,9 @@ export default async function Page({ params }) {
               {news.category}
             </span>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">{news.title}</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            {news.title}
+          </h1>
           <div className="flex items-center gap-4 text-sm text-gray-600 mb-6">
             <div className="flex items-center">
               <span className="mr-1">🕐</span>
@@ -48,7 +52,9 @@ export default async function Page({ params }) {
                 />
               </div>
               {news.caption && (
-                <p className="text-sm text-gray-600 mt-2 text-center italic">{news.caption}</p>
+                <p className="text-sm text-gray-600 mt-2 text-center italic">
+                  {news.caption}
+                </p>
               )}
             </div>
           )}

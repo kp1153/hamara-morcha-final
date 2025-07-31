@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { fetchNewsBySlugAndCategory } from "@/lib/newsService";
+import NewsAnalytics from "@/components/NewsAnalytics";
 
 export default async function Page({ params }) {
   const { slug } = await params;
@@ -22,6 +23,7 @@ export default async function Page({ params }) {
 
   return (
     <main className="min-h-screen bg-gray-50">
+      <NewsAnalytics newsData={news} />
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex items-center mb-4">
