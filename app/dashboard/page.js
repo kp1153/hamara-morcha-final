@@ -350,6 +350,29 @@ export default function AdminDashboard() {
               }}
               className="w-full px-4 py-3 text-lg border-4 border-dotted border-pink-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black bg-white"
             />
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <p className="text-sm text-blue-700 font-medium mb-2">
+                HTML Formatting Guide:
+              </p>
+              <div className="text-xs text-blue-600 space-y-1">
+                <p>
+                  <code className="bg-blue-100 px-1 rounded">
+                    &lt;b&gt;Bold Text&lt;/b&gt;
+                  </code>{" "}
+                  - Bold के लिए
+                </p>
+                <p>
+                  <code className="bg-blue-100 px-1 rounded">
+                    &lt;p&gt;Paragraph&lt;/p&gt;
+                  </code>{" "}
+                  - नया paragraph के लिए
+                </p>
+                <p>
+                  <code className="bg-blue-100 px-1 rounded">&lt;br&gt;</code> -
+                  Line break के लिए
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Image Upload */}
