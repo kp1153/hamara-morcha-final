@@ -63,6 +63,44 @@ export default function AdminDashboard() {
     }));
   };
 
+  const insertHtmlTag = (tag) => {
+    const textarea = document.querySelector('textarea[name="content"]');
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+
+    let newText = "";
+    if (tag === "bold") {
+      newText = selectedText ? `<b>${selectedText}</b>` : "<b></b>";
+    } else if (tag === "paragraph") {
+      newText = selectedText ? `<p>${selectedText}</p>` : "<p></p>";
+    } else if (tag === "break") {
+      newText = "<br>";
+    }
+
+    const newContent =
+      textarea.value.substring(0, start) +
+      newText +
+      textarea.value.substring(end);
+
+    setNewsForm((prev) => ({
+      ...prev,
+      content: newContent,
+    }));
+
+    // Set cursor position after the inserted tag
+    setTimeout(() => {
+      const cursorPos =
+        tag === "break"
+          ? start + newText.length
+          : start +
+            newText.length -
+            (selectedText ? 0 : tag === "bold" ? 4 : 4);
+      textarea.focus();
+      textarea.setSelectionRange(cursorPos, cursorPos);
+    }, 0);
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewsForm((prev) => ({
@@ -336,6 +374,35 @@ export default function AdminDashboard() {
             <label className="block text-sm font-semibold text-gray-700">
               पूरी खबर *
             </label>
+
+            {/* HTML Formatting Buttons */}
+            <div className="flex gap-2 mb-3">
+              <button
+                type="button"
+                onClick={() => insertHtmlTag("bold")}
+                className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm font-bold transition-colors"
+                title="Bold text के लिए"
+              >
+                <b>B</b>
+              </button>
+              <button
+                type="button"
+                onClick={() => insertHtmlTag("paragraph")}
+                className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm transition-colors"
+                title="Paragraph के लिए"
+              >
+                P
+              </button>
+              <button
+                type="button"
+                onClick={() => insertHtmlTag("break")}
+                className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm transition-colors"
+                title="Line break के लिए"
+              >
+                BR
+              </button>
+            </div>
+
             <textarea
               name="content"
               value={newsForm.content}
@@ -343,8 +410,6 @@ export default function AdminDashboard() {
               placeholder="यहाँ पूरी खबर लिखें..."
               rows="10"
               style={{
-                textAlign: "left",
-                direction: "ltr",
                 backgroundColor: "white",
                 color: "black",
               }}
@@ -370,6 +435,10 @@ export default function AdminDashboard() {
                 <p>
                   <code className="bg-blue-100 px-1 rounded">&lt;br&gt;</code> -
                   Line break के लिए
+                </p>
+                <p className="text-xs text-gray-500 mt-2">
+                  Tip: Text select करके buttons दबाएं या empty tags के बीच type
+                  करें
                 </p>
               </div>
             </div>
