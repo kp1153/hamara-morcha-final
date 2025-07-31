@@ -32,6 +32,7 @@ export default function AdminDashboard() {
     category: "",
     publishDate: "",
     caption: "",
+    slug: "",
   });
 
   const [selectedImages, setSelectedImages] = useState([]);
@@ -90,16 +91,18 @@ export default function AdminDashboard() {
   };
 
   const handleSubmit = async () => {
-    if (!newsForm.title || !newsForm.content || !newsForm.category) {
-      alert("कृपया सभी आवश्यक फील्ड भरें!");
+    if (
+      !newsForm.title ||
+      !newsForm.content ||
+      !newsForm.category ||
+      !newsForm.slug
+    ) {
+      alert("कृपया सभी आवश्यक फील्ड भरें (Slug भी)!");
       return;
     }
 
     setUploading(true);
 
-    const generateSlug = (title) => {
-      return `news-article-${Date.now()}`;
-    };
     let uploadedImageUrls = [];
 
     if (selectedImages.length > 0) {
@@ -112,7 +115,8 @@ export default function AdminDashboard() {
     try {
       const newsData = {
         title: newsForm.title,
-        slug: generateSlug(newsForm.title),
+
+        slug: newsForm.slug,
         content: newsForm.content,
         category: newsForm.category,
         caption: newsForm.caption,
@@ -120,7 +124,7 @@ export default function AdminDashboard() {
           newsForm.publishDate || new Date().toISOString().split("T")[0],
         status: "published",
         // IST में current time
-        createdAt: (() => {
+        created_at: (() => {
           const istTime = new Date();
           istTime.setHours(istTime.getHours() + 5);
           istTime.setMinutes(istTime.getMinutes() + 30);
@@ -148,6 +152,7 @@ export default function AdminDashboard() {
         category: "",
         publishDate: "",
         caption: "",
+        slug: "",
       });
       setSelectedImages([]);
       setEditingNews(null);
@@ -170,6 +175,7 @@ export default function AdminDashboard() {
       category: news.category,
       publishDate: news.publishDate,
       caption: news.caption || "",
+      slug: news.slug || "",
     });
     setSelectedImages(news.images || []);
     setEditingNews(news);
@@ -200,6 +206,7 @@ export default function AdminDashboard() {
       category: "",
       publishDate: "",
       caption: "",
+      slug: "",
     });
     setSelectedImages([]);
   };
@@ -259,11 +266,28 @@ export default function AdminDashboard() {
                 ))}
               </select>
             </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                URL Slug (English में) *
+              </label>
+              <input
+                type="text"
+                name="slug"
+                value={newsForm.slug}
+                onChange={handleInputChange}
+                placeholder="bhu-new-vice-chancellor-ajeet-chaturvedi"
+                style={{ textAlign: "left", direction: "ltr" }}
+                className="w-full px-4 py-3 text-lg border-4 border-dotted border-pink-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black bg-white"
+              />
+              <p className="text-xs text-gray-500">
+                केवल lowercase, numbers और hyphens (-) use करें
+              </p>
+            </div>
           </div>
 
-          {/* Content */}
+          <div className="space-y-2"></div>
 
-          {/* Content - Rich Text Editor */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-gray-700">
               पूरी खबर *
