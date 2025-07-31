@@ -12,7 +12,6 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import React, { useState, useEffect } from "react";
 import { Upload, Send, Trash2, Edit } from "lucide-react";
 import { uploadImage } from "@/lib/imageService";
-import RichTextEditor from '@/components/RichTextEditor';
 
 const categories = [
   { href: "/desh-videsh", label: "देश-विदेश" },
@@ -272,15 +271,18 @@ export default function AdminDashboard() {
 
           {/* Content */}
 
-    {/* Content - Rich Text Editor */}
+          {/* Content - Rich Text Editor */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-gray-700">
               पूरी खबर *
             </label>
-            <RichTextEditor
+            <textarea
+              name="content"
               value={newsForm.content}
-              onChange={(content) => setNewsForm(prev => ({ ...prev, content }))}
+              onChange={handleInputChange}
               placeholder="यहाँ पूरी खबर लिखें..."
+              rows="10"
+              className="w-full px-4 py-3 text-lg border-4 border-dotted border-pink-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black bg-white"
             />
           </div>
 
@@ -458,11 +460,7 @@ export default function AdminDashboard() {
   );
 
   return (
-    
-
-<div className="fixed top-0 left-0 w-screen h-screen z-[9999] bg-white overflow-auto p-4">
-
-
+    <div className="fixed top-0 left-0 w-screen h-screen z-[9999] bg-white overflow-auto p-4">
       {/* Navigation Tabs */}
       <div className="mb-6">
         <nav className="flex space-x-1 bg-gray-200 p-1 rounded-lg w-fit">
