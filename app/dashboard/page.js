@@ -98,12 +98,15 @@ export default function AdminDashboard() {
     setUploading(true);
 
     // Slug generate करें
+    // Fixed generateSlug function - Line 107 को replace करो
     const generateSlug = (title) => {
-      return title
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, "")
-        .replace(/\s+/g, "-")
-        .trim();
+      return (
+        title
+          .toLowerCase()
+          .replace(/[^\u0900-\u097F\w\s-]/g, "") // ✅ Hindi characters को preserve करता है
+          .replace(/\s+/g, "-")
+          .trim() || Date.now().toString()
+      ); // ✅ Fallback अगर slug empty हो
     };
 
     let uploadedImageUrls = [];
