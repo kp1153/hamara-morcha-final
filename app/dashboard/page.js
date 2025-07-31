@@ -10,7 +10,7 @@ import {
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import React, { useState, useEffect } from "react";
-import { Upload, Send, Trash2, Edit } from "lucide-react";
+import { Upload, Send, Trash2, Edit, RefreshCw } from "lucide-react";
 import { uploadImage } from "@/lib/imageService";
 
 const categories = [
@@ -37,6 +37,32 @@ export default function AdminDashboard() {
 
   const [selectedImages, setSelectedImages] = useState([]);
   const [newsList, setNewsList] = useState([]);
+
+  const generateSlug = () => {
+    const now = new Date();
+
+    // IST में convert करें
+    const istTime = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
+
+    const year = istTime.getFullYear();
+    const month = String(istTime.getMonth() + 1).padStart(2, "0");
+    const day = String(istTime.getDate()).padStart(2, "0");
+    const hours = String(istTime.getHours()).padStart(2, "0");
+    const minutes = String(istTime.getMinutes()).padStart(2, "0");
+    const seconds = String(istTime.getSeconds()).padStart(2, "0");
+    const milliseconds = String(istTime.getMilliseconds()).padStart(3, "0");
+
+    return `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}`;
+  };
+
+  const handleAutoGenerateSlug = () => {
+    const newSlug = generateSlug();
+    setNewsForm((prev) => ({
+      ...prev,
+      slug: newSlug,
+    }));
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewsForm((prev) => ({
@@ -50,10 +76,16 @@ export default function AdminDashboard() {
     try {
       const newsCollection = collection(db, "news");
       const newsSnapshot = await getDocs(newsCollection);
-      const newsData = newsSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const newsData = newsSnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          created_at: data.created_at?.toDate?.()
+            ? data.created_at.toDate().toISOString()
+            : data.created_at,
+        };
+      });
       setNewsList(newsData);
       console.log("News fetched:", newsData);
     } catch (error) {
@@ -271,17 +303,29 @@ export default function AdminDashboard() {
               <label className="block text-sm font-semibold text-gray-700">
                 URL Slug (English में) *
               </label>
-              <input
-                type="text"
-                name="slug"
-                value={newsForm.slug}
-                onChange={handleInputChange}
-                placeholder="bhu-new-vice-chancellor-ajeet-chaturvedi"
-                style={{ textAlign: "left", direction: "ltr" }}
-                className="w-full px-4 py-3 text-lg border-4 border-dotted border-pink-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black bg-white"
-              />
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  name="slug"
+                  value={newsForm.slug}
+                  onChange={handleInputChange}
+                  placeholder="Manual slug या Auto Generate button दबाएं"
+                  style={{ textAlign: "left", direction: "ltr" }}
+                  className="flex-1 px-4 py-3 text-lg border-4 border-dotted border-pink-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black bg-white"
+                />
+                <button
+                  type="button"
+                  onClick={handleAutoGenerateSlug}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2"
+                  title="Auto generate timestamp slug"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  <span>Auto</span>
+                </button>
+              </div>
               <p className="text-xs text-gray-500">
-                केवल lowercase, numbers और hyphens (-) use करें
+                Manual slug लिखें या Auto Generate button से timestamp slug
+                बनाएं
               </p>
             </div>
           </div>
