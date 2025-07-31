@@ -460,7 +460,7 @@ export default function AdminDashboard() {
   return (
     
 
- <div className="fixed top-0 left-0 w-screen h-screen z-[9999] bg-white overflow-auto p-4"></div>
+<div className="fixed top-0 left-0 w-screen h-screen z-[9999] bg-white overflow-auto p-4">
 
 
       {/* Navigation Tabs */}
