@@ -458,7 +458,11 @@ export default function AdminDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    
+
+ <div className="fixed top-0 left-0 w-screen h-screen z-[9999] bg-white overflow-auto p-4"></div>
+
+
       {/* Navigation Tabs */}
       <div className="mb-6">
         <nav className="flex space-x-1 bg-gray-200 p-1 rounded-lg w-fit">
