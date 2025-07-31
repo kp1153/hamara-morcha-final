@@ -33,18 +33,48 @@ const RichTextEditor = ({ value, onChange, placeholder }) => {
   const execCommand = (command, value = null) => {
     document.execCommand(command, false, value);
     editorRef.current.focus();
-    updateContent();
+    // Remove unwanted attributes after command execution
+    setTimeout(() => {
+      removeUnwantedAttributes();
+      updateContent();
+    }, 100);
+  };
+
+  const removeUnwantedAttributes = () => {
+    if (editorRef.current) {
+      const elements = editorRef.current.querySelectorAll("*");
+      elements.forEach((el) => {
+        el.removeAttribute("data-start");
+        el.removeAttribute("data-end");
+        if (el.style.textAlign === "left") {
+          el.style.removeProperty("text-align");
+        }
+      });
+    }
   };
 
   const updateContent = () => {
     if (editorRef.current) {
+      removeUnwantedAttributes();
       onChange(editorRef.current.innerHTML);
     }
   };
 
   const handleColorChange = (color) => {
-    execCommand("foreColor", color);
+    if (editorRef.current) {
+      editorRef.current.focus();
+      const selection = window.getSelection();
+      if (selection.rangeCount > 0) {
+        document.execCommand("styleWithCSS", false, true);
+        document.execCommand("foreColor", false, color);
+        document.execCommand("styleWithCSS", false, false);
+      }
+    }
     setShowColorPicker(false);
+    setTimeout(() => {
+      removeUnwantedAttributes();
+      updateContent();
+    }, 100);
   };
 
   const insertLink = () => {
@@ -163,19 +193,26 @@ const RichTextEditor = ({ value, onChange, placeholder }) => {
           </button>
 
           {showColorPicker && (
-            <div className="absolute top-10 left-0 bg-white border rounded-lg shadow-lg p-2 z-10">
-              <div className="grid grid-cols-5 gap-1">
+            <div className="absolute top-10 left-0 bg-white border-2 border-gray-300 rounded-lg shadow-xl p-3 z-50 min-w-[200px]">
+              <div className="grid grid-cols-5 gap-2">
                 {colors.map((color) => (
                   <button
                     key={color}
                     type="button"
                     onClick={() => handleColorChange(color)}
-                    className="w-6 h-6 rounded border"
+                    className="w-8 h-8 rounded-md border-2 border-gray-300 hover:border-gray-500 transition-colors"
                     style={{ backgroundColor: color }}
                     title={color}
                   />
                 ))}
               </div>
+              <button
+                type="button"
+                onClick={() => setShowColorPicker(false)}
+                className="mt-2 text-xs text-gray-500 hover:text-gray-700 w-full text-center"
+              >
+                बंद करें
+              </button>
             </div>
           )}
         </div>
@@ -200,6 +237,8 @@ const RichTextEditor = ({ value, onChange, placeholder }) => {
         onBlur={updateContent}
         className="min-h-[400px] p-4 text-lg leading-relaxed focus:outline-none"
         style={{
+          direction: "ltr",
+          textAlign: "left",
           whiteSpace: "pre-wrap",
           wordWrap: "break-word",
         }}
