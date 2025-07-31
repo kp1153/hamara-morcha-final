@@ -125,7 +125,13 @@ export default function AdminDashboard() {
         publishDate:
           newsForm.publishDate || new Date().toISOString().split("T")[0],
         status: "published",
-        createdAt: new Date().toISOString(),
+        // IST में current time
+        createdAt: (() => {
+          const istTime = new Date();
+          istTime.setHours(istTime.getHours() + 5);
+          istTime.setMinutes(istTime.getMinutes() + 30);
+          return istTime.toISOString();
+        })(),
         images: uploadedImageUrls,
         image_url: uploadedImageUrls.length > 0 ? uploadedImageUrls[0] : null,
       };
