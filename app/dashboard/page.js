@@ -12,6 +12,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import React, { useState, useEffect } from "react";
 import { Upload, Send, Trash2, Edit } from "lucide-react";
 import { uploadImage } from "@/lib/imageService";
+import RichTextEditor from '@/components/RichTextEditor';
 
 const categories = [
   { href: "/desh-videsh", label: "देश-विदेश" },
@@ -270,17 +271,16 @@ export default function AdminDashboard() {
           </div>
 
           {/* Content */}
+
+    {/* Content - Rich Text Editor */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-gray-700">
               पूरी खबर *
             </label>
-            <textarea
-              name="content"
+            <RichTextEditor
               value={newsForm.content}
-              onChange={handleInputChange}
+              onChange={(content) => setNewsForm(prev => ({ ...prev, content }))}
               placeholder="यहाँ पूरी खबर लिखें..."
-              rows="20"
-              className="w-full px-4 py-3 text-lg border-4 border-dotted border-pink-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none text-black bg-white"
             />
           </div>
 
