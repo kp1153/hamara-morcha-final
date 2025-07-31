@@ -97,18 +97,9 @@ export default function AdminDashboard() {
 
     setUploading(true);
 
-    // Slug generate करें
-    // Fixed generateSlug function - Line 107 को replace करो
     const generateSlug = (title) => {
-      return (
-        title
-          .toLowerCase()
-          .replace(/[^\u0900-\u097F\w\s-]/g, "") // ✅ Hindi characters को preserve करता है
-          .replace(/\s+/g, "-")
-          .trim() || Date.now().toString()
-      ); // ✅ Fallback अगर slug empty हो
+      return `news-article-${Date.now()}`;
     };
-
     let uploadedImageUrls = [];
 
     if (selectedImages.length > 0) {
@@ -243,6 +234,7 @@ export default function AdminDashboard() {
                 value={newsForm.title}
                 onChange={handleInputChange}
                 placeholder="यहाँ शीर्षक लिखें..."
+                style={{ textAlign: "left", direction: "ltr" }}
                 className="w-full px-4 py-3 text-lg border-4 border-dotted border-pink-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black bg-white"
               />
             </div>
@@ -282,6 +274,12 @@ export default function AdminDashboard() {
               onChange={handleInputChange}
               placeholder="यहाँ पूरी खबर लिखें..."
               rows="10"
+              style={{
+                textAlign: "left",
+                direction: "ltr",
+                backgroundColor: "white",
+                color: "black",
+              }}
               className="w-full px-4 py-3 text-lg border-4 border-dotted border-pink-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black bg-white"
             />
           </div>
@@ -343,6 +341,7 @@ export default function AdminDashboard() {
                 value={newsForm.caption}
                 onChange={handleInputChange}
                 placeholder="फोटो के लिए कैप्शन लिखें..."
+                style={{ textAlign: "left", direction: "ltr" }}
                 className="w-full px-4 py-3 text-lg border-4 border-dotted border-pink-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black bg-white"
               />
             </div>
