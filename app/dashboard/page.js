@@ -173,23 +173,23 @@ export default function AdminDashboard() {
 
     setUploading(true);
 
-    let uploadedImageUrls = [];
-
-    if (selectedImages.length > 0) {
-      const uploadPromises = selectedImages.map((image) => {
-        // Skip upload for existing images
-        if (image.isExisting) {
-          return Promise.resolve(image.preview);
-        }
-        return uploadImage(image.file);
-      });
-      uploadedImageUrls = await Promise.all(uploadPromises);
-    }
-
     try {
+      let uploadedImageUrls = [];
+
+      if (selectedImages.length > 0) {
+        console.log("Starting image upload...");
+        const uploadPromises = selectedImages.map((image) => {
+          if (image.isExisting) {
+            return Promise.resolve(image.preview);
+          }
+          return uploadImage(image.file);
+        });
+        uploadedImageUrls = await Promise.all(uploadPromises);
+        console.log("Images uploaded:", uploadedImageUrls);
+      }
+
       const newsData = {
         title: newsForm.title,
-
         slug: newsForm.slug,
         content: newsForm.content,
         category: newsForm.category,
@@ -197,7 +197,6 @@ export default function AdminDashboard() {
         publishDate:
           newsForm.publishDate || new Date().toISOString().split("T")[0],
         status: "published",
-        // IST में current time
         created_at: (() => {
           const istTime = new Date();
           istTime.setHours(istTime.getHours() + 5);
@@ -209,17 +208,14 @@ export default function AdminDashboard() {
       };
 
       if (editingNews) {
-        // Update existing news in Firestore
         const newsDoc = doc(db, "news", editingNews.id);
         await updateDoc(newsDoc, newsData);
         alert("न्यूज सफलतापूर्वक अपडेट हुई!");
       } else {
-        // Add new news to Firestore
         await addDoc(collection(db, "news"), newsData);
         alert("न्यूज सफलतापूर्वक प्रकाशित हुई!");
       }
 
-      // Reset form और refresh data
       setNewsForm({
         title: "",
         content: "",
@@ -231,12 +227,10 @@ export default function AdminDashboard() {
       setSelectedImages([]);
       setEditingNews(null);
       setActiveTab("manage-news");
-
-      // Fresh data fetch करें
       fetchNewsFromFirestore();
     } catch (error) {
       console.error("Error:", error);
-      alert("न्यूज पोस्ट करने में एरर आई!");
+      alert(`एरर: ${error.message}`);
     } finally {
       setUploading(false);
     }
