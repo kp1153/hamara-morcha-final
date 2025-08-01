@@ -176,9 +176,13 @@ export default function AdminDashboard() {
     let uploadedImageUrls = [];
 
     if (selectedImages.length > 0) {
-      const uploadPromises = selectedImages.map((image) =>
-        uploadImage(image.file)
-      );
+      const uploadPromises = selectedImages.map((image) => {
+        // Skip upload for existing images
+        if (image.isExisting) {
+          return Promise.resolve(image.preview);
+        }
+        return uploadImage(image.file);
+      });
       uploadedImageUrls = await Promise.all(uploadPromises);
     }
 
@@ -247,7 +251,18 @@ export default function AdminDashboard() {
       caption: news.caption || "",
       slug: news.slug || "",
     });
-    setSelectedImages(news.images || []);
+
+    // Fix existing images structure
+    const existingImages = news.images
+      ? news.images.map((imageUrl, index) => ({
+          file: null,
+          preview: imageUrl,
+          name: `existing_image_${index}`,
+          isExisting: true,
+        }))
+      : [];
+
+    setSelectedImages(existingImages);
     setEditingNews(news);
     setActiveTab("create-news");
   };
