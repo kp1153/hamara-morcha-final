@@ -146,6 +146,7 @@ export default function AdminDashboard() {
             file: file,
             preview: event.target.result,
             name: file.name,
+            isExisting: false, // Mark as new upload
           });
         };
         reader.readAsDataURL(file);
@@ -173,23 +174,43 @@ export default function AdminDashboard() {
 
     setUploading(true);
 
-    let uploadedImageUrls = [];
-
-    if (selectedImages.length > 0) {
-      const uploadPromises = selectedImages.map((image) => {
-        // Skip upload for existing images
-        if (image.isExisting) {
-          return Promise.resolve(image.preview);
-        }
-        return uploadImage(image.file);
-      });
-      uploadedImageUrls = await Promise.all(uploadPromises);
-    }
-
     try {
+      let uploadedImageUrls = [];
+
+      if (selectedImages.length > 0) {
+        console.log("Processing images:", selectedImages);
+
+        const uploadPromises = selectedImages.map((image, index) => {
+          console.log(`Processing image ${index}:`, image);
+
+          // Skip upload for existing images
+          if (image.isExisting) {
+            console.log(`Keeping existing image: ${image.preview}`);
+            return Promise.resolve(image.preview);
+          }
+
+          // Validate file before upload
+          if (!image.file) {
+            console.error("File is missing for image:", image);
+            return Promise.resolve(null);
+          }
+
+          // Upload with error handling
+          console.log(`Uploading new image: ${image.name}`);
+          return uploadImage(image.file).catch((error) => {
+            console.error("Upload failed for image:", image.name, error);
+            return null;
+          });
+        });
+
+        const uploadResults = await Promise.all(uploadPromises);
+        uploadedImageUrls = uploadResults.filter((url) => url !== null);
+
+        console.log("Final uploaded URLs:", uploadedImageUrls);
+      }
+
       const newsData = {
         title: newsForm.title,
-
         slug: newsForm.slug,
         content: newsForm.content,
         category: newsForm.category,
@@ -235,14 +256,16 @@ export default function AdminDashboard() {
       // Fresh data fetch करें
       fetchNewsFromFirestore();
     } catch (error) {
-      console.error("Error:", error);
-      alert("न्यूज पोस्ट करने में एरर आई!");
+      console.error("Submit error:", error);
+      alert("न्यूज पोस्ट करने में एरर आई: " + error.message);
     } finally {
       setUploading(false);
     }
   };
 
   const handleEdit = (news) => {
+    console.log("🔧 Edit button clicked for news:", news);
+
     setNewsForm({
       title: news.title,
       content: news.content,
@@ -252,16 +275,26 @@ export default function AdminDashboard() {
       slug: news.slug || "",
     });
 
-    // Fix existing images structure
-    const existingImages = news.images
-      ? news.images.map((imageUrl, index) => ({
-          file: null,
-          preview: imageUrl,
-          name: `existing_image_${index}`,
-          isExisting: true,
-        }))
-      : [];
+    // Fix existing images structure with proper validation
+    const existingImages =
+      news.images && Array.isArray(news.images)
+        ? news.images
+            .map((imageUrl, index) => {
+              if (!imageUrl) {
+                console.warn(`Empty image URL at index ${index}`);
+                return null;
+              }
+              return {
+                file: null,
+                preview: imageUrl,
+                name: `existing_image_${index}`,
+                isExisting: true,
+              };
+            })
+            .filter(Boolean) // Remove null entries
+        : [];
 
+    console.log("📝 Setting existing images:", existingImages);
     setSelectedImages(existingImages);
     setEditingNews(news);
     setActiveTab("create-news");
@@ -498,6 +531,11 @@ export default function AdminDashboard() {
                     >
                       ×
                     </button>
+                    {image.isExisting && (
+                      <div className="absolute bottom-1 left-1 bg-green-500 text-white text-xs px-1 rounded">
+                        मौजूदा
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
