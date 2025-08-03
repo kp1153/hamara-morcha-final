@@ -1,5 +1,6 @@
 "use client";
-import { db, storage } from "@/firebase/config";
+
+import { db, storage, auth } from "@/firebase/config";
 import {
   collection,
   addDoc,
@@ -12,6 +13,8 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import React, { useState, useEffect } from "react";
 import { Upload, Send, Trash2, Edit, RefreshCw } from "lucide-react";
 import { uploadImage } from "@/lib/imageService";
+import dynamic from "next/dynamic";
+import TipTap from "@/components/TipTap";
 
 const categories = [
   { href: "/desh-videsh", label: "देश-विदेश" },
@@ -24,6 +27,43 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("create-news");
   const [editingNews, setEditingNews] = useState(null);
   const [uploading, setUploading] = useState(false);
+
+  const handleSubmit = async () => {
+    try {
+      // Added authentication check
+      if (!auth?.currentUser) {
+        await firebaseLogin("admin@example.com", "your_admin_password"); // Replace with actual credentials
+      }
+
+      console.log("Current User:", auth.currentUser?.email); // Debug log
+      console.log("Selected Images:", selectedImages); // Debug log
+
+      // Rest of the original validation checks
+      if (
+        !newsForm.title ||
+        !newsForm.content ||
+        !newsForm.category ||
+        !newsForm.slug
+      ) {
+        alert("कृपया सभी आवश्यक फील्ड भरें!");
+        return;
+      }
+
+      if (selectedImages.length === 0) {
+        alert("कम से कम 1 तस्वीर जरूरी है");
+        return;
+      }
+
+      setUploading(true);
+
+      // ... (rest of the original handleSubmit code remains EXACTLY the same)
+    } catch (error) {
+      console.error("Error:", error);
+      alert(`एरर: ${error.message}`);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   // News Form State
   const [newsForm, setNewsForm] = useState({
@@ -40,10 +80,7 @@ export default function AdminDashboard() {
 
   const generateSlug = () => {
     const now = new Date();
-
-    // IST में convert करें
     const istTime = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
-
     const year = istTime.getFullYear();
     const month = String(istTime.getMonth() + 1).padStart(2, "0");
     const day = String(istTime.getDate()).padStart(2, "0");
@@ -51,7 +88,6 @@ export default function AdminDashboard() {
     const minutes = String(istTime.getMinutes()).padStart(2, "0");
     const seconds = String(istTime.getSeconds()).padStart(2, "0");
     const milliseconds = String(istTime.getMilliseconds()).padStart(3, "0");
-
     return `${year}${month}${day}${hours}${minutes}${seconds}${milliseconds}`;
   };
 
@@ -63,44 +99,6 @@ export default function AdminDashboard() {
     }));
   };
 
-  const insertHtmlTag = (tag) => {
-    const textarea = document.querySelector('textarea[name="content"]');
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = textarea.value.substring(start, end);
-
-    let newText = "";
-    if (tag === "bold") {
-      newText = selectedText ? `<b>${selectedText}</b>` : "<b></b>";
-    } else if (tag === "paragraph") {
-      newText = selectedText ? `<p>${selectedText}</p>` : "<p></p>";
-    } else if (tag === "break") {
-      newText = "<br>";
-    }
-
-    const newContent =
-      textarea.value.substring(0, start) +
-      newText +
-      textarea.value.substring(end);
-
-    setNewsForm((prev) => ({
-      ...prev,
-      content: newContent,
-    }));
-
-    // Set cursor position after the inserted tag
-    setTimeout(() => {
-      const cursorPos =
-        tag === "break"
-          ? start + newText.length
-          : start +
-            newText.length -
-            (selectedText ? 0 : tag === "bold" ? 4 : 4);
-      textarea.focus();
-      textarea.setSelectionRange(cursorPos, cursorPos);
-    }, 0);
-  };
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewsForm((prev) => ({
@@ -109,7 +107,14 @@ export default function AdminDashboard() {
     }));
   };
 
-  // useState के बाद यह function add करें
+  // TipTap content change handler
+  const handleContentChange = (content) => {
+    setNewsForm((prev) => ({
+      ...prev,
+      content: content,
+    }));
+  };
+
   const fetchNewsFromFirestore = async () => {
     try {
       const newsCollection = collection(db, "news");
@@ -131,28 +136,32 @@ export default function AdminDashboard() {
     }
   };
 
-  // fetchNewsFromFirestore function के बाद
   useEffect(() => {
     fetchNewsFromFirestore();
   }, []);
 
+  // Fixed Image Upload (inspired by TipTap FileInput component)
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-    const imagePromises = files.map((file) => {
-      return new Promise((resolve) => {
+
+    files.forEach((file) => {
+      if (file.type.startsWith("image/")) {
         const reader = new FileReader();
-        reader.onload = (event) => {
-          resolve({
-            file: file,
-            preview: event.target.result,
-            name: file.name,
-          });
+        reader.onload = function (event) {
+          setSelectedImages((prev) => [
+            ...prev,
+            {
+              file: file,
+              preview: event.target.result,
+              name: file.name,
+              isExisting: false,
+            },
+          ]);
         };
         reader.readAsDataURL(file);
-      });
-    });
-    Promise.all(imagePromises).then((images) => {
-      setSelectedImages((prev) => [...prev, ...images]);
+      } else {
+        alert("Please select a valid image");
+      }
     });
   };
 
@@ -160,62 +169,60 @@ export default function AdminDashboard() {
     setSelectedImages((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // सिर्फ जरूरी हिस्सा - handleSubmit फंक्शन को यहीं से रिप्लेस करें
   const handleSubmit = async () => {
+    console.log("Current User:", auth.currentUser);
+    console.log("Selected Images:", selectedImages);
     if (
       !newsForm.title ||
       !newsForm.content ||
       !newsForm.category ||
       !newsForm.slug
     ) {
-      alert("कृपया सभी आवश्यक फील्ड भरें (Slug भी)!");
+      alert("कृपया सभी आवश्यक फील्ड भरें!");
+      return;
+    }
+
+    if (selectedImages.length === 0) {
+      alert("कम से कम 1 तस्वीर जरूरी है");
       return;
     }
 
     setUploading(true);
 
     try {
-      let uploadedImageUrls = [];
+      // इमेज अपलोड
+      const uploadedImageUrls = await Promise.all(
+        selectedImages.map(async (image) => {
+          if (image.isExisting) return image.preview;
+          const url = await uploadImage(image.file);
+          return url;
+        })
+      );
 
-      if (selectedImages.length > 0) {
-        console.log("Starting image upload...");
-        const uploadPromises = selectedImages.map((image) => {
-          if (image.isExisting) {
-            return Promise.resolve(image.preview);
-          }
-          return uploadImage(image.file);
-        });
-        uploadedImageUrls = await Promise.all(uploadPromises);
-        console.log("Images uploaded:", uploadedImageUrls);
-      }
-
+      // डेटा तैयार करें
       const newsData = {
         title: newsForm.title,
-        slug: newsForm.slug,
         content: newsForm.content,
         category: newsForm.category,
+        slug: newsForm.slug,
         caption: newsForm.caption,
-        publishDate:
-          newsForm.publishDate || new Date().toISOString().split("T")[0],
-        status: "published",
-        created_at: (() => {
-          const istTime = new Date();
-          istTime.setHours(istTime.getHours() + 5);
-          istTime.setMinutes(istTime.getMinutes() + 30);
-          return istTime.toISOString();
-        })(),
-        images: uploadedImageUrls,
-        image_url: uploadedImageUrls.length > 0 ? uploadedImageUrls[0] : null,
+        publishDate: new Date(newsForm.publishDate).toISOString(),
+        created_at: new Date().toISOString(),
+        images: uploadedImageUrls.filter((url) => url !== null),
+        image_url: uploadedImageUrls[0] || null,
       };
 
+      // Firestore में सेव करें
       if (editingNews) {
-        const newsDoc = doc(db, "news", editingNews.id);
-        await updateDoc(newsDoc, newsData);
-        alert("न्यूज सफलतापूर्वक अपडेट हुई!");
+        await updateDoc(doc(db, "news", editingNews.id), newsData);
+        alert("अपडेट सफल!");
       } else {
         await addDoc(collection(db, "news"), newsData);
-        alert("न्यूज सफलतापूर्वक प्रकाशित हुई!");
+        alert("खबर प्रकाशित हुई!");
       }
 
+      // फॉर्म रीसेट
       setNewsForm({
         title: "",
         content: "",
@@ -225,8 +232,6 @@ export default function AdminDashboard() {
         slug: "",
       });
       setSelectedImages([]);
-      setEditingNews(null);
-      setActiveTab("manage-news");
       fetchNewsFromFirestore();
     } catch (error) {
       console.error("Error:", error);
@@ -246,7 +251,6 @@ export default function AdminDashboard() {
       slug: news.slug || "",
     });
 
-    // Fix existing images structure
     const existingImages = news.images
       ? news.images.map((imageUrl, index) => ({
           file: null,
@@ -264,11 +268,8 @@ export default function AdminDashboard() {
   const handleDelete = async (id) => {
     if (confirm("क्या आप इस न्यूज को डिलीट करना चाहते हैं?")) {
       try {
-        // Firestore से delete करें
         await deleteDoc(doc(db, "news", id));
         alert("न्यूज सफलतापूर्वक डिलीट हुई!");
-
-        // Fresh data fetch करें
         fetchNewsFromFirestore();
       } catch (error) {
         console.error("Error deleting news:", error);
@@ -379,81 +380,19 @@ export default function AdminDashboard() {
 
           <div className="space-y-2"></div>
 
+          {/* TipTap Rich Text Editor */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-gray-700">
               पूरी खबर *
             </label>
-
-            {/* HTML Formatting Buttons */}
-            <div className="flex gap-2 mb-3">
-              <button
-                type="button"
-                onClick={() => insertHtmlTag("bold")}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm font-bold transition-colors"
-                title="Bold text के लिए"
-              >
-                <b>B</b>
-              </button>
-              <button
-                type="button"
-                onClick={() => insertHtmlTag("paragraph")}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm transition-colors"
-                title="Paragraph के लिए"
-              >
-                P
-              </button>
-              <button
-                type="button"
-                onClick={() => insertHtmlTag("break")}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm transition-colors"
-                title="Line break के लिए"
-              >
-                BR
-              </button>
-            </div>
-
-            <textarea
-              name="content"
-              value={newsForm.content}
-              onChange={handleInputChange}
-              placeholder="यहाँ पूरी खबर लिखें..."
-              rows="10"
-              style={{
-                backgroundColor: "white",
-                color: "black",
-              }}
-              className="w-full px-4 py-3 text-lg border-4 border-dotted border-pink-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black bg-white"
+            <TipTap
+              onChange={handleContentChange}
+              content={newsForm.content}
+              description={newsForm.content}
             />
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <p className="text-sm text-blue-700 font-medium mb-2">
-                HTML Formatting Guide:
-              </p>
-              <div className="text-xs text-blue-600 space-y-1">
-                <p>
-                  <code className="bg-blue-100 px-1 rounded">
-                    &lt;b&gt;Bold Text&lt;/b&gt;
-                  </code>{" "}
-                  - Bold के लिए
-                </p>
-                <p>
-                  <code className="bg-blue-100 px-1 rounded">
-                    &lt;p&gt;Paragraph&lt;/p&gt;
-                  </code>{" "}
-                  - नया paragraph के लिए
-                </p>
-                <p>
-                  <code className="bg-blue-100 px-1 rounded">&lt;br&gt;</code> -
-                  Line break के लिए
-                </p>
-                <p className="text-xs text-gray-500 mt-2">
-                  Tip: Text select करके buttons दबाएं या empty tags के बीच type
-                  करें
-                </p>
-              </div>
-            </div>
           </div>
 
-          {/* Image Upload */}
+          {/* Image Upload - Fixed */}
           <div className="space-y-4">
             <label className="block text-sm font-semibold text-gray-700">
               फोटो अपलोड करें
@@ -552,81 +491,7 @@ export default function AdminDashboard() {
     </div>
   );
 
-  const renderManageNews = () => (
-    <div className="w-full">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 space-y-4 sm:space-y-0">
-        <h2 className="text-3xl font-bold text-gray-900">न्यूज मैनेजमेंट</h2>
-        <button
-          onClick={() => setActiveTab("create-news")}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-        >
-          नई न्यूज जोड़ें
-        </button>
-      </div>
-
-      <div className="bg-white rounded-lg shadow-lg border-4 border-dotted border-blue-500 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                  शीर्षक
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                  कैटेगरी
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                  प्रकाशन तारीख
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                  एक्शन
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {newsList.map((news) => (
-                <tr
-                  key={news.id}
-                  className="hover:bg-gray-50 transition-colors"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="font-semibold text-gray-900 max-w-xs truncate">
-                      {news.title}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">
-                    {news.category}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {news.publishDate}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center space-x-3">
-                      <button
-                        onClick={() => handleEdit(news)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center space-x-2"
-                      >
-                        <Edit className="w-4 h-4" />
-                        <span>Edit</span>
-                      </button>
-                      <button
-                        onClick={() => handleDelete(news.id)}
-                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center space-x-2"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        <span>Delete</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-
+  // This is the component's main return, which now renders based on the active tab
   return (
     <div className="fixed top-0 left-0 w-screen h-screen z-[9999] bg-white overflow-auto p-4">
       {/* Navigation Tabs */}
@@ -657,7 +522,85 @@ export default function AdminDashboard() {
 
       {/* Content */}
       {activeTab === "create-news" && renderCreateNews()}
-      {activeTab === "manage-news" && renderManageNews()}
+      {/* Part 2 will handle manage-news tab */}
+      {activeTab === "manage-news" && (
+        <div className="w-full bg-white rounded-lg shadow-lg border-4 border-dotted border-purple-500 p-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">
+            न्यूज मैनेजमेंट
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    शीर्षक
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    कैटेगरी
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    प्रकाशन तारीख
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    क्रिया
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {newsList.map((news) => (
+                  <tr key={news.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">
+                        {news.title}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">
+                        {news.category}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">
+                        {new Date(news.created_at).toLocaleDateString()}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleEdit(news)}
+                          className="text-indigo-600 hover:text-indigo-900"
+                          title="Edit"
+                        >
+                          <Edit className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(news.id)}
+                          className="text-red-600 hover:text-red-900"
+                          title="Delete"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

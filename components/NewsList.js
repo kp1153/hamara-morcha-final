@@ -82,13 +82,13 @@ export default function NewsList() {
             {item.title}
           </h2>
 
-          {item.imageUrl && (
+          {item.imageUrl?.trim() && (
             <div className="mb-3">
               <img
                 src={item.imageUrl}
                 alt={item.caption || item.title}
                 className="w-full h-48 object-cover rounded-md"
-                loading="lazy" // ✅ Performance optimization
+                loading="lazy"
               />
             </div>
           )}
