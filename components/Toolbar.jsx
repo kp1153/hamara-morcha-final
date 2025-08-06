@@ -1,6 +1,7 @@
 // ./components/Toolbar.jsx
 "use client";
 
+import React, { useRef } from "react";
 import { BiBold, BiItalic } from "react-icons/bi";
 import { FaListUl, FaQuoteLeft, FaUnderline, FaImage } from "react-icons/fa";
 import { MdFormatStrikethrough, MdUndo } from "react-icons/md";
@@ -11,9 +12,23 @@ import { IoCode } from "react-icons/io5";
 import { BsFillPaletteFill } from "react-icons/bs";
 
 export default function Toolbar({ editor }) {
+  const imageInputRef = useRef(null);
+
   if (!editor) {
     return null;
   }
+
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        editor.chain().focus().setImage({ src: reader.result }).run();
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="flex flex-wrap gap-2 p-2 rounded-t-lg border border-gray-300 bg-gray-100 dark:bg-gray-700">
       <button
@@ -168,16 +183,19 @@ export default function Toolbar({ editor }) {
         type="button"
         onClick={(e) => {
           e.preventDefault();
-          const url = window.prompt("Enter the image URL:");
-          // यह नई कंडीशन है जो यह सुनिश्चित करती है कि URL खाली न हो
-          if (url && url.length > 0) {
-            editor.chain().focus().setImage({ src: url }).run();
-          }
+          imageInputRef.current.click();
         }}
         className="p-2 rounded-lg bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-gray-200"
       >
         <FaImage className="w-5 h-5" />
       </button>
+      <input
+        type="file"
+        ref={imageInputRef}
+        onChange={handleImageUpload}
+        className="hidden"
+        accept="image/*"
+      />
       <div className="relative flex items-center">
         <input
           type="color"

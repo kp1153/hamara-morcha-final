@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/firebase/config"; // ✅ Missing import added
 import Link from "next/link"; // ✅ Next.js navigation के लिए
 
 export default function NewsList() {
@@ -82,10 +83,10 @@ export default function NewsList() {
             {item.title}
           </h2>
 
-          {item.imageUrl?.trim() && (
+          {item.image_url?.trim() && (
             <div className="mb-3">
               <img
-                src={item.imageUrl}
+                src={item.image_url}
                 alt={item.caption || item.title}
                 className="w-full h-48 object-cover rounded-md"
                 loading="lazy"

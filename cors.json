@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["https://www.hamaramorcha.com"],
+    "method": ["GET"],
+    "responseHeader": ["Content-Type"],
+    "maxAgeSeconds": 3600
+  }
+]

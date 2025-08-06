@@ -1,21 +1,15 @@
+// ./components/TipTap.jsx
 "use client";
 
+import "./styles.css";
+import Underline from "@tiptap/extension-underline";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Toolbar from "./Toolbar";
 import Image from "@tiptap/extension-image";
-import { Color } from "@tiptap/extension-color";
-import { TextStyle } from "@tiptap/extension-text-style";
-import Placeholder from "@tiptap/extension-placeholder";
-import { useState, useEffect } from "react";
+import Toolbar from "./Toolbar";
+import { useEffect } from "react";
 
-export default function TipTap({ onChange, content, description }) {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
+export default function TipTap({ onContentChange, content }) {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -24,49 +18,31 @@ export default function TipTap({ onChange, content, description }) {
         inline: true,
         allowBase64: true,
       }),
-      TextStyle,
-      Color,
-      Placeholder.configure({
-        placeholder: "अपनी कहानी लिखें...",
-      }),
     ],
-    content: isMounted ? content || description || "" : "",
+    content: content,
     editorProps: {
       attributes: {
         class:
-          "w-full min-h-[400px] p-4 bg-white dark:bg-gray-800 text-black dark:text-white border border-gray-300 rounded-b-lg focus:outline-none prose",
+          "tiptap prose max-w-none flex flex-col px-4 py-3 justify-start min-h-80 border border-gray-300 text-gray-900 items-start w-full gap-3 font-medium text-[16px] pt-4 rounded-br-md rounded-bl-md outline-none focus:outline-none focus:ring-2 focus:ring-blue-500",
       },
     },
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      onContentChange(editor.getHTML());
     },
-    // Add this to prevent SSR mismatch
     immediatelyRender: false,
   });
 
   useEffect(() => {
-    if (!editor || !isMounted) return;
-
-    const currentContent = editor.getHTML();
-    const newContent = content || description || "";
-
-    if (currentContent !== newContent) {
-      editor.commands.setContent(newContent);
+    // सिर्फ़ तभी कंटेंट अपडेट करें जब यह बाहरी सोर्स से बदला हो
+    if (editor && content && editor.getHTML() !== content) {
+      editor.commands.setContent(content);
     }
-  }, [editor, content, description, isMounted]);
-
-  if (!isMounted) {
-    return (
-      <div className="w-full min-h-[400px] p-4 bg-white dark:bg-gray-800 border border-gray-300 rounded-b-lg">
-        Loading editor...
-      </div>
-    );
-  }
+  }, [editor, content]);
 
   return (
     <div className="w-full mt-6">
       <Toolbar editor={editor} />
-      <EditorContent editor={editor} />
+      <EditorContent style={{ whiteSpace: "pre-line" }} editor={editor} />
     </div>
   );
 }
