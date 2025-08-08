@@ -15,6 +15,8 @@ import React, { useState, useEffect } from "react";
 import { Upload, Send, Trash2, Edit, RefreshCw } from "lucide-react";
 import { uploadImage } from "@/lib/imageService";
 import TipTap from "@/components/TipTap";
+import { onAuthStateChanged } from "firebase/auth";
+import { useRouter } from "next/navigation";
 
 const categories = [
   { href: "/desh-videsh", label: "देश-विदेश" },
@@ -40,6 +42,16 @@ export default function AdminDashboard() {
 
   const [selectedImages, setSelectedImages] = useState([]);
   const [newsList, setNewsList] = useState([]);
+  const router = useRouter(); // अगर already नहीं है तो add करें
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        alert("पहले लॉगिन करना होगा");
+        router.push("/login");
+      }
+    });
+  }, []);
 
   const generateSlug = () => {
     const now = new Date();
