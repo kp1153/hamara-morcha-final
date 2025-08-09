@@ -5,8 +5,9 @@ import { fetchNewsBySlugAndCategory } from "@/lib/newsService";
 
 export default async function Page({ params }) {
   const { slug } = await params;
+  const safeSlug = decodeURIComponent(slug);
+  const news = await fetchNewsBySlugAndCategory(safeSlug, "देश-विदेश");
 
-  const news = await fetchNewsBySlugAndCategory(slug, "देश-विदेश");
   if (!news) notFound();
 
   const formatDate = (dateString) => {

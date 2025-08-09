@@ -5,8 +5,10 @@ import NewsAnalytics from "@/components/NewsAnalytics";
 
 export default async function Page({ params }) {
   const { slug } = await params;
+  const safeSlug = decodeURIComponent(slug);
 
-  const news = await fetchNewsBySlugAndCategory(slug, "प्रतिरोध");
+  const news = await fetchNewsBySlugAndCategory(safeSlug, "प्रतिरोध");
+
   if (!news) notFound();
 
   const formatDate = (dateString) => {
@@ -58,10 +60,10 @@ export default async function Page({ params }) {
               )}
             </div>
           )}
-         <div 
-  className="text-gray-800 leading-relaxed text-base md:text-lg"
-  dangerouslySetInnerHTML={{ __html: news.content }}
-/>
+          <div
+            className="text-gray-800 leading-relaxed text-base md:text-lg"
+            dangerouslySetInnerHTML={{ __html: news.content }}
+          />
         </div>
       </div>
     </main>

@@ -76,9 +76,12 @@ export default function HomePage() {
           )}
 
           {item.content && (
-            <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-              {item.content.substring(0, 200)}...
-            </p>
+            <div
+              className="text-gray-700 leading-relaxed whitespace-pre-line"
+              dangerouslySetInnerHTML={{
+                __html: item.content.substring(0, 200) + "...",
+              }}
+            />
           )}
         </div>
       ))}

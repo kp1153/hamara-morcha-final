@@ -11,7 +11,7 @@ export default async function CodingKiDuniyaPage() {
       <ul className="space-y-4">
         {posts.map((item) => (
           <li key={item.id} className="bg-white p-4 rounded shadow">
-            <Link href={`/coding-ki-duniya/${item.slug}`}>
+            <Link href={`/coding-ki-duniya/${encodeURIComponent(item.slug)}`}>
               <h2 className="text-xl font-semibold text-red-600 hover:underline cursor-pointer">
                 {item.title}
               </h2>
@@ -36,7 +36,10 @@ export default async function CodingKiDuniyaPage() {
               </div>
             )}
 
-            <p className="mt-2 text-blue-700">{item.content}</p>
+            <div
+              className="mt-2 text-blue-700"
+              dangerouslySetInnerHTML={{ __html: item.content }}
+            />
           </li>
         ))}
       </ul>
