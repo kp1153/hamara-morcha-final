@@ -70,7 +70,7 @@ export default function HomePage() {
                 alt={item.title}
                 width={400}
                 height={200}
-                className="rounded-lg object-cover"
+                className="rounded-lg object-contain"
               />
             </div>
           )}
