@@ -50,7 +50,7 @@ export default function Team() {
           </h1>
           <div className="w-32 h-1 bg-gradient-to-r from-orange-400 to-red-500 mx-auto rounded-full"></div>
           <p className="text-gray-300 text-sm mt-4 max-w-2xl mx-auto leading-relaxed">
-            "हमारा मोर्चा" के पीछे की प्रतिभाशाली टीम से मिलिए
+            "हमारा मोर्चा" की प्रेरणा-शक्ति है उसकी टीम के युवा साथी।
           </p>
         </div>
       </div>
@@ -145,7 +145,12 @@ export default function Team() {
               ></div>
             ))}
           </div>
-          <p className="text-gray-400 text-sm">साथ मिलकर बनाते हैं बेहतर कल</p>
+          <p className="text-gray-400 text-sm">
+            पूरी टीम समाचारों की दुनिया में इसलिए जूझ रही है ताकि कोडिंग के जरिए
+            दुनिया को बेहतर बना सके। अब आप कहेंगे कि कंप्यूटर लैंग्वेजेज और
+            समाचारों की दुनिया में क्या संबंध है भला, तो बताता चलूँ कि गहरा
+            संबंध है। हमारी आजीविक का जरिया पत्रकारिता नहीं, वरन कोडिंग है।
+          </p>
         </div>
       </div>
     </div>
