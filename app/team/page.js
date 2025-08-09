@@ -50,7 +50,7 @@ export default function Team() {
           </h1>
           <div className="w-32 h-1 bg-gradient-to-r from-orange-400 to-red-500 mx-auto rounded-full"></div>
           <p className="text-gray-300 text-sm mt-4 max-w-2xl mx-auto leading-relaxed">
-            "हमारा मोर्चा" की प्रेरणा-शक्ति है उसकी टीम के युवा साथी।
+            "हमारा मोर्चा" की प्रेरणा-शक्ति हैं उसकी टीम के युवा साथी।
           </p>
         </div>
       </div>

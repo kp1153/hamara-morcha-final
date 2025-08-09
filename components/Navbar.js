@@ -41,8 +41,8 @@ const Navbar = () => {
                 href={href}
                 className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 border-2 ${
                   isActive
-                    ? "bg-orange-600 text-white border-orange-600 shadow-lg transform scale-105"
-                    : "text-orange-700 border-orange-200 hover:bg-orange-50 hover:border-orange-400 hover:text-orange-800 hover:shadow-md"
+                    ? "bg-blue-600 text-white border-purple-600 shadow-lg transform scale-105"
+                    : "text-purple-700 border-orange-200 hover:bg-orange-50 hover:border-sky-400 hover:text-cyan-800 hover:shadow-md"
                 }`}
               >
                 {label}
