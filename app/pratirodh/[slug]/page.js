@@ -49,7 +49,7 @@ export default async function Page({ params }) {
                   src={news.image_url.trimEnd()}
                   alt={news.title}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   priority
                 />
               </div>

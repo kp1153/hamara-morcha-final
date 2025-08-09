@@ -26,7 +26,7 @@ export default async function JeevanKeRangPage() {
                   alt={item.title}
                   width={600}
                   height={300}
-                  className="rounded-lg object-cover w-full"
+                  className="rounded-lg object-contain w-full"
                 />
                 {/* ✅ Caption only if exists */}
                 {item.caption && (
