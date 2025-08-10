@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { fetchNewsBySlugAndCategory } from "@/lib/newsService";
 import NewsAnalytics from "@/components/NewsAnalytics";
+import ViewsCounter from "@/components/ViewsCounter";
 
 export default async function Page({ params }) {
   const { slug } = await params;
@@ -41,6 +42,7 @@ export default async function Page({ params }) {
               <span className="mr-1">🕐</span>
               {formatDate(news.created_at)}
             </div>
+            <ViewsCounter slug={safeSlug} />
           </div>
           {news.image_url && (
             <div className="mb-6">

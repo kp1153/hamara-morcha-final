@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@google-analytics/data": "^5.2.0",
     "@tiptap/core": "^3.0.9",
     "@tiptap/extension-bold": "^3.0.9",
     "@tiptap/extension-bullet-list": "^3.0.9",
