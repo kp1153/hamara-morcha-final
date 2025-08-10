@@ -21,7 +21,7 @@ import { useRouter } from "next/navigation";
 const categories = [
   { href: "/desh-videsh", label: "देश-विदेश" },
   { href: "/jeevan-ke-rang", label: "जीवन के रंग" },
-  { href: "/coding-ki-duniya", label: "कोडिंग की दुनिया" },
+  { href: "/vividha", label: "विविध" },
   { href: "/pratirodh", label: "प्रतिरोध" },
 ];
 

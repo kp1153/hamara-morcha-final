@@ -8,7 +8,7 @@ export default async function Page({ params }) {
   const { slug } = await params;
   const safeSlug = decodeURIComponent(slug);
 
-  const news = await fetchNewsBySlugAndCategory(safeSlug, "कोडिंग की दुनिया");
+  const news = await fetchNewsBySlugAndCategory(safeSlug, "विविध");
 
   if (!news) notFound();
 

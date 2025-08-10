@@ -4,14 +4,14 @@ import Image from "next/image";
 import { getNewsByCategory } from "@/lib/newsService";
 
 export default async function CodingKiDuniyaPage() {
-  const posts = await getNewsByCategory("कोडिंग की दुनिया");
+  const posts = await getNewsByCategory("विविध");
 
   return (
     <main className="max-w-3xl mx-auto p-4">
       <ul className="space-y-4">
         {posts.map((item) => (
           <li key={item.id} className="bg-white p-4 rounded shadow">
-            <Link href={`/coding-ki-duniya/${encodeURIComponent(item.slug)}`}>
+            <Link href={`/vividha/${encodeURIComponent(item.slug)}`}>
               <h2 className="text-xl font-semibold text-red-600 hover:underline cursor-pointer">
                 {item.title}
               </h2>
