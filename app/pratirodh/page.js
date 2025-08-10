@@ -8,7 +8,6 @@ export default async function PratirodhPage() {
 
   return (
     <main className="max-w-3xl mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">प्रतिरोध</h1>
       <ul className="space-y-4">
         {posts.map((item) => (
           <li key={item.id} className="bg-white p-4 rounded shadow">
