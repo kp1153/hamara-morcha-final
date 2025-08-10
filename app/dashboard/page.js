@@ -408,7 +408,7 @@ export default function AdminDashboard() {
                       फोटो अपलोड करने के लिए क्लिक करें
                     </p>
                     <p className="text-sm text-gray-500">
-                      JPG, PNG, GIF (Max 5MB)
+                      JPG, PNG, GIF (Max 7MB)
                     </p>
                   </label>
                 </div>
