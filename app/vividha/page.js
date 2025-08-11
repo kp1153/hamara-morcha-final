@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getNewsByCategory } from "@/lib/newsService";
 
-export default async function CodingKiDuniyaPage() {
+export default async function VividhaPage() {
   const posts = await getNewsByCategory("विविध");
 
   return (

@@ -14,7 +14,7 @@ export default function HomePage() {
     const categoryMap = {
       "देश-विदेश": "desh-videsh",
       "जीवन के रंग": "jeevan-ke-rang",
-      "कोडिंग की दुनिया": "coding-ki-duniya",
+      विविध: "vividha",
       प्रतिरोध: "pratirodh",
     };
     return categoryMap[category] || category;
