@@ -2,7 +2,6 @@
 "use client";
 
 import "./styles.css";
-import Underline from "@tiptap/extension-underline";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
@@ -13,7 +12,6 @@ export default function TipTap({ onContentChange, content }) {
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Underline,
       Image.configure({
         inline: true,
         allowBase64: true,
