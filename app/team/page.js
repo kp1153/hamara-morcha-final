@@ -106,7 +106,7 @@ export default function Team() {
                     </h2>
 
                     {/* Contact Info for Kamta Prasad */}
-                    {id === 4 && (
+                    {(phone || address || email) && (
                       <div className="text-gray-300 text-xs space-y-1 mb-3">
                         <p className="flex items-center justify-center text-center">
                           <span className="text-orange-400 mr-1">📍</span>
