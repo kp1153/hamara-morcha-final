@@ -1,13 +1,14 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 
-// टीम डेटा
+// Team Data
 const teamMembers = [
   {
     id: 1,
-    name: "माननीय चीकू सिंह बुंदेला",
-    role: "संरक्षक",
+    name: "चीकू सिंह बुंदेला",
+    role: "उर्फ दीवान जी, जिन्होंने नाग-पंचमी के दिन हमारे परिवार की नाग-देवता से रक्षा की थी और जिन्हें गोद में उठाए हुए हैं हमारे प्रधान संपादक दिगंत शुक्ल और उनके साथ में विक्ट्री का चिह्न बनाकर खड़े हुए हैं संपादक अद्वय शुक्ल",
     photo: "/images/1.jpg",
-    slug: "chiku-singh-bundela",
+    slug: "cheeku-singh-bundela",
   },
   {
     id: 2,
@@ -43,16 +44,8 @@ const teamMembers = [
   {
     id: 6,
     name: "अखिलेश चौधरी",
-    role: (
-      <>
-        <span className="block font-semibold text-orange-400">
-          सीनियर रिपोर्टर
-        </span>
-        <span className="block text-sm text-gray-300">
-          प्रभारीः सिद्धार्थनगर, बस्ती और गोरखपुर
-        </span>
-      </>
-    ),
+    role: "सीनियर रिपोर्टर",
+    designation: "प्रभारीः सिद्धार्थनगर, बस्ती और गोरखपुर",
     photo: "/images/6.jpg",
     phone: "77540 93975",
     slug: "akhilesh-chaudhary",
@@ -60,7 +53,7 @@ const teamMembers = [
 ];
 
 export default async function TeamMemberPage({ params }) {
-  const { slug } = await params; // ✅ Next.js 15.4 के लिए async destructuring
+  const { slug } = await params;
 
   const member = teamMembers.find((m) => m.slug === slug);
 
@@ -77,10 +70,23 @@ export default async function TeamMemberPage({ params }) {
           className="w-64 h-80 object-cover rounded-lg mx-auto mb-6 shadow-lg"
         />
         <h1 className="text-3xl font-bold mb-2">{member.name}</h1>
-        <p className="text-orange-400 font-semibold mb-4">{member.role}</p>
-        {member.address && <p className="mb-2">📍 {member.address}</p>}
-        {member.phone && <p className="mb-2">📞 {member.phone}</p>}
-        {member.email && <p className="mb-2">✉️ {member.email}</p>}
+
+        {member.id === 6 ? (
+          <div className="mb-4">
+            <span className="block font-semibold text-orange-400">
+              {"सीनियर रिपोर्टर"}
+            </span>
+            <span className="block text-sm text-gray-300">
+              {"प्रभारीः सिद्धार्थनगर, बस्ती और गोरखपुर"}
+            </span>
+          </div>
+        ) : (
+          <p className="text-orange-400 font-semibold mb-4">{member.role}</p>
+        )}
+
+        {member.address && <p className="mb-2">{"📍 " + member.address}</p>}
+        {member.phone && <p className="mb-2">{"📞 " + member.phone}</p>}
+        {member.email && <p className="mb-2">{"✉️ " + member.email}</p>}
       </div>
     </div>
   );
