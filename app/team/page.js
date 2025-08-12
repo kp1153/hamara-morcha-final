@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import Image from "next/image";
+import Link from "next/link";
 
 const teamMembers = [
   {
@@ -8,24 +8,28 @@ const teamMembers = [
     name: "माननीय चीकू सिंह बुंदेला उर्फ दीवान जी, जिन्हें गोद में उठाए हुए हैं हमारे प्रधान संपादक दिगंत शुक्ल और उनके साथ में विक्ट्री का चिह्न बनाकर खड़े हुए हैं संपादक अद्वय शुक्ल",
     role: "संरक्षक",
     photo: "/images/1.jpg",
+    slug: "chiku-singh-bundela",
   },
   {
     id: 2,
     name: "दिगंत शुक्ल",
     role: "प्रधान संपादक",
     photo: "/images/2.jpg",
+    slug: "digant-shukla",
   },
   {
     id: 3,
     name: "अद्वय शुक्ल",
     role: "संपादक",
     photo: "/images/3.jpg",
+    slug: "advay-shukla",
   },
   {
     id: 4,
     name: "कामता प्रसाद",
     role: "कार्यकारी संपादक",
     photo: "/images/4.jpg",
+    slug: "kamta-prasad",
     address: "तिवारी भवन, ग्रामः गहरपुर, पोस्टः पुआरीकलां -221202, वाराणसी।",
     phone: "9996865069",
     email: "hamaramorcha1153@gmail.com",
@@ -35,12 +39,14 @@ const teamMembers = [
     name: "सुमन तिवारी",
     role: "प्रबंध निदेशक",
     photo: "/images/5.jpg",
+    slug: "suman-tiwari",
   },
   {
     id: 6,
     name: "अखिलेश चौधरी",
     role: "सीनियर रिपोर्टर, प्रभारीः सिद्धार्थनगर, बस्ती और गोरखपुर",
     photo: "/images/6.jpg",
+    slug: "akhilesh-chaudhary",
     phone: "77540 93975",
   },
 ];
@@ -66,8 +72,9 @@ export default function Team() {
       <div className="max-w-7xl mx-auto px-4 pb-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
           {teamMembers.map(
-            ({ id, name, role, photo, address, phone, email }, index) => (
-              <div
+            ({ id, name, role, photo, address, phone, email, slug }) => (
+              <Link
+                href={`/team/${slug}`}
                 key={id}
                 className={`group relative ${
                   id === 1 ? "lg:col-span-2 lg:row-span-1" : ""
@@ -105,59 +112,37 @@ export default function Team() {
                       {name}
                     </h2>
 
-                    {/* Contact Info for Kamta Prasad */}
+                    {/* Contact Info */}
                     {(phone || address || email) && (
                       <div className="text-gray-300 text-xs space-y-1 mb-3">
-                        <p className="flex items-center justify-center text-center">
-                          <span className="text-orange-400 mr-1">📍</span>
-                          <span className="leading-tight">{address}</span>
-                        </p>
-                        <p className="flex items-center justify-center">
-                          <span className="text-orange-400 mr-1">📞</span>
-                          {phone}
-                        </p>
-                        <p className="flex items-center justify-center">
-                          <span className="text-orange-400 mr-1">✉️</span>
-                          {email}
-                        </p>
+                        {address && (
+                          <p className="flex items-center justify-center text-center">
+                            <span className="text-orange-400 mr-1">📍</span>
+                            <span className="leading-tight">{address}</span>
+                          </p>
+                        )}
+                        {phone && (
+                          <p className="flex items-center justify-center">
+                            <span className="text-orange-400 mr-1">📞</span>
+                            {phone}
+                          </p>
+                        )}
+                        {email && (
+                          <p className="flex items-center justify-center">
+                            <span className="text-orange-400 mr-1">✉️</span>
+                            {email}
+                          </p>
+                        )}
                       </div>
                     )}
 
                     {/* Decorative Line */}
-                    <div className="w-16 h-0.5 bg-gradient-to-r from-orange-400 to-red-500 mx-auto rounded-full transform scale-0 group-hover:scale-100 transition-transform duration-500"></div>
+                    <div className="w-16 h-0.5 bg-gradient-to-r from-orange-400 to-red-500 mx-auto rounded-full"></div>
                   </div>
-
-                  {/* Hover Effect Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-orange-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
                 </div>
-
-                {/* Floating Animation */}
-                <div className="absolute -z-10 inset-0 bg-gradient-to-r from-orange-400/20 to-red-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform group-hover:scale-110"></div>
-              </div>
+              </Link>
             )
           )}
-        </div>
-      </div>
-
-      {/* Bottom Decoration */}
-      <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-        <div className="relative py-12 text-center">
-          <div className="flex justify-center space-x-2 mb-4">
-            {[...Array(5)].map((_, i) => (
-              <div
-                key={i}
-                className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"
-                style={{ animationDelay: `${i * 0.2}s` }}
-              ></div>
-            ))}
-          </div>
-          <p className="text-gray-400 text-sm">
-            पूरी टीम समाचारों की दुनिया में इसलिए जूझ रही है ताकि कोडिंग के जरिए
-            दुनिया को बेहतर बना सके। अब आप कहेंगे कि कंप्यूटर लैंग्वेजेज और
-            समाचारों की दुनिया में क्या संबंध है भला, तो बताता चलूँ कि गहरा
-            संबंध है। हमारी आजीविक का जरिया पत्रकारिता नहीं, वरन कोडिंग है।
-          </p>
         </div>
       </div>
     </div>
