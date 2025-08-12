@@ -36,6 +36,13 @@ const teamMembers = [
     role: "प्रबंध निदेशक",
     photo: "/images/5.jpg",
   },
+  {
+    id: 6,
+    name: "अखिलेश चौधरी",
+    role: "सीनियर रिपोर्टर, प्रभारीः सिद्धार्थनगर, बस्ती और गोरखपुर",
+    photo: "/images/6.jpg",
+    phone: "77540 93975",
+  },
 ];
 
 export default function Team() {
