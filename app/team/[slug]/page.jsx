@@ -43,7 +43,16 @@ const teamMembers = [
   {
     id: 6,
     name: "अखिलेश चौधरी",
-    role: "सीनियर रिपोर्टर, प्रभारीः सिद्धार्थनगर, बस्ती और गोरखपुर",
+    role: (
+      <>
+        <span className="block font-semibold text-orange-400">
+          सीनियर रिपोर्टर
+        </span>
+        <span className="block text-sm text-gray-300">
+          प्रभारीः सिद्धार्थनगर, बस्ती और गोरखपुर
+        </span>
+      </>
+    ),
     photo: "/images/6.jpg",
     phone: "77540 93975",
     slug: "akhilesh-chaudhary",
