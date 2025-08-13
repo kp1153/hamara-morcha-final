@@ -4,8 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getAllNews } from "../lib/newsService";
+import * as gtag from "@/lib/gtag"; // GA functions import करें
 
-export default function HomePage() {
+const HomePage = () => {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,6 +20,10 @@ export default function HomePage() {
     };
     return categoryMap[category] || category;
   };
+
+  useEffect(() => {
+    gtag.pageview("/");
+  }, []);
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -87,4 +92,5 @@ export default function HomePage() {
       ))}
     </main>
   );
-}
+};
+export default HomePage;
