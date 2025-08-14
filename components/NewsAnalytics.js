@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { event } from "@/lib/gtag";
 
-export default function NewsAnalytics({ newsData }) {
+const NewsAnalytics = ({ newsData }) => {
   useEffect(() => {
     if (newsData) {
       // Individual news view track करने के लिए
@@ -23,5 +23,7 @@ export default function NewsAnalytics({ newsData }) {
     }
   }, [newsData]);
 
-  return null; // यह component कुछ render नहीं करता, सिर्फ tracking के लिए है
-}
+  return null;
+};
+
+export default NewsAnalytics;

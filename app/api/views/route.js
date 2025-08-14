@@ -1,20 +1,17 @@
 import { NextResponse } from "next/server";
 import { BetaAnalyticsDataClient } from "@google-analytics/data";
 
-export const dynamic = "force-dynamic"; // Next 13/14/15: SSR, no static cache
-export const revalidate = 0; // कोई कैश नहीं
-
-// GA credentials env var से (Vercel → Settings → Environment Variables)
-const credentialsJson = process.env.GA_CREDENTIALS;
-
 const analyticsDataClient = new BetaAnalyticsDataClient({
-  credentials: credentialsJson ? JSON.parse(credentialsJson) : undefined,
+  credentials: JSON.parse(process.env.GA_CREDENTIALS),
 });
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const slug = searchParams.get("slug"); // e.g. "/jeevan-ke-rang/20250813235240261"
+    const slug = searchParams.get("slug"); // example: "/category/post-slug"
 
     if (!slug) {
       return NextResponse.json(
@@ -23,8 +20,7 @@ export async function GET(request) {
       );
     }
 
-    // पहले EXACT ट्राई करेंगे: अगर पूरा path आया है तो तुरंत मिलेगा
-    const exactReq = {
+    const resp = await analyticsDataClient.runReport({
       property: "properties/498352741",
       dateRanges: [{ startDate: "today", endDate: "today" }],
       dimensions: [{ name: "pagePath" }],
@@ -35,29 +31,11 @@ export async function GET(request) {
           stringFilter: { matchType: "EXACT", value: slug },
         },
       },
-    };
+    });
 
-    let [resp] = await analyticsDataClient.runReport(exactReq);
-    let views = Number(resp.rows?.[0]?.metricValues?.[0]?.value || 0);
-
-    // अगर EXACT से 0 आया, तो PARTIAL ट्राई करो (कहीं तुमने सिर्फ slug का अंतिम हिस्सा भेजा हो)
-    if (!views) {
-      const partialReq = {
-        ...exactReq,
-        dimensionFilter: {
-          filter: {
-            fieldName: "pagePath",
-            stringFilter: { matchType: "PARTIAL", value: slug },
-          },
-        },
-      };
-      [resp] = await analyticsDataClient.runReport(partialReq);
-      views = Number(resp.rows?.[0]?.metricValues?.[0]?.value || 0);
-    }
-
+    const views = Number(resp.rows?.[0]?.metricValues?.[0]?.value || 0);
     return NextResponse.json({ views });
-  } catch (error) {
-    console.error("Error fetching views:", error);
+  } catch (err) {
     return NextResponse.json(
       { error: "Failed to fetch views" },
       { status: 500 }

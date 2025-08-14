@@ -3,11 +3,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { getNewsByCategory } from "@/lib/newsService";
 
-export default async function DeshVideshPage() {
+const DeshVideshPage = async () => {
   const posts = await getNewsByCategory("देश-विदेश");
 
   return (
-    <main className="max-w-3xl mx-auto p-4">  
+    <main className="max-w-3xl mx-auto p-4">
       <ul className="space-y-4">
         {posts.map((item) => (
           <li key={item.id} className="bg-white p-4 rounded shadow">
@@ -45,4 +45,5 @@ export default async function DeshVideshPage() {
       </ul>
     </main>
   );
-}
+};
+export default DeshVideshPage;
