@@ -4,7 +4,7 @@ import Image from "next/image";
 import { fetchNewsBySlugAndCategory } from "@/lib/newsService";
 import ViewsCounter from "@/components/ViewsCounter";
 
-const DeshVideshPage = async ({ params }) => {
+export default async function DeshVideshPage({ params }) {
   const { slug } = await params;
   const safeSlug = decodeURIComponent(slug);
   const news = await fetchNewsBySlugAndCategory(safeSlug, "देश-विदेश");
@@ -69,5 +69,4 @@ const DeshVideshPage = async ({ params }) => {
       </div>
     </main>
   );
-};
-export default DeshVideshPage;
+}

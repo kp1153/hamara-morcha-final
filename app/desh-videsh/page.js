@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getNewsByCategory } from "@/lib/newsService";
 
-const DeshVideshPage = async () => {
+export default async function DeshVideshPage() {
   const posts = await getNewsByCategory("देश-विदेश");
 
   return (
@@ -46,4 +46,4 @@ const DeshVideshPage = async () => {
     </main>
   );
 };
-export default DeshVideshPage;
+

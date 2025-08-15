@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { getAllNews } from "../lib/newsService";
 import * as gtag from "@/lib/gtag"; // GA functions import करें
 
-const HomePage = () => {
+export default function HomePage() {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -93,4 +93,4 @@ const HomePage = () => {
     </main>
   );
 };
-export default HomePage;
+
