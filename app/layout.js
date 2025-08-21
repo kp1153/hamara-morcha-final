@@ -16,8 +16,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "न्यूज पोर्टल 'हमारा मोर्चा'",
-  description: "हमारा मोर्चा फाउंडेशन द्वारा संचालित",
+  title:
+    "खुद कामता प्रसाद यानि कि https://www.web-developer-kp.com/ ने  इस वेबसाइट को नेक्स्ट.जेए पर विकसित किया है, जो पेशेवर वेब-डेवलपर हैं।",
+  description:
+    "हम लेटेस्ट टेक्नोलॉजी पर बनाते हैं, ऐसी वेबसाइट जिस पर नहीं आता कोई सालाना खर्च, इसी टेक्नोलॉजी पर बना है हमारा मोर्चा",
 };
 
 export default function RootLayout({ children }) {

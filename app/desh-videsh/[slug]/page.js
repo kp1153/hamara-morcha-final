@@ -41,7 +41,8 @@ export default async function DeshVideshPage({ params }) {
               <span className="mr-1">🕐</span>
               {formatDate(news.created_at)}
             </div>
-            <ViewsCounter slug={safeSlug} />
+
+            <ViewsCounter slug={`/desh-videsh/${safeSlug}`} />
           </div>
           {news.image_url && (
             <div className="mb-6">

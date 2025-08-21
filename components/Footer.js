@@ -20,21 +20,20 @@ const Footer = () => {
           आपके हवाले कर दूँगा।
         </p>
 
-        <p className="text-white font-bold bg-[#700] p-2 rounded">
+        <p className="text-white font-bold bg-[#2e0077] p-2 rounded">
           अगर आपको Multi-languages यानि कि एक से अधिक भाषाओं में सामग्री दिखाने
           वाली वेबसाइट बनवानी है और इस संबंध में विस्तार से जानकारी चाहते हैं तो
           कृपया क्लिक करें:{" "}
           <a
-            href="https://creativesolutions-tau.vercel.app/"
+            href="https://www.web-developer-kp.com/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-white hover:underline hover:text-blue-200 font-semibold"
           >
-            https://creativesolutions-tau.vercel.app/ ध्यान रहे मैं अनुभवी
-            अनुवादक हूँ और हमेशा टीम के साथ मिलकर काम करता रहा हूँ। मेरी टीम में
-            सभी भारतीय भाषाओं के कुशल अनुवादक हैं। समस्त यूरोपीय भाषाओं में भी
-            कांटेंट को ट्रांसलेट करवा दूँगा, लेकिन आपको उसके लिए अलग से भुगतान
-            करना होगा।
+            https://www.web-developer-kp.com/ ध्यान रहे मैं अनुभवी अनुवादक हूँ
+            और हमेशा टीम के साथ मिलकर काम करता रहा हूँ। मेरी टीम में सभी भारतीय
+            भाषाओं के कुशल अनुवादक हैं। समस्त यूरोपीय भाषाओं में भी कांटेंट को
+            ट्रांसलेट करवा दूँगा, लेकिन आपको उसके लिए अलग से भुगतान करना होगा।
           </a>
         </p>
 

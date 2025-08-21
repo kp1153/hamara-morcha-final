@@ -41,7 +41,7 @@ export default async function Page({ params }) {
               <span className="mr-1">🕐</span>
               {formatDate(news.created_at)}
             </div>
-            <ViewsCounter slug={safeSlug} />
+            <ViewsCounter slug={`/jeewan-ke-rang/${safeSlug}`} />
           </div>
           {news.image_url && (
             <div className="mb-6">

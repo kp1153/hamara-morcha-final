@@ -2,7 +2,10 @@ import { NextResponse } from "next/server";
 import { BetaAnalyticsDataClient } from "@google-analytics/data";
 
 const analyticsDataClient = new BetaAnalyticsDataClient({
-  credentials: JSON.parse(process.env.GA_CREDENTIALS),
+  credentials: {
+    client_email: process.env.GA_CLIENT_EMAIL,
+    private_key: process.env.GA_PRIVATE_KEY.replace(/\\n/g, "\n"),
+  },
 });
 
 export const dynamic = "force-dynamic";
@@ -11,7 +14,7 @@ export const revalidate = 0;
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const slug = searchParams.get("slug"); // example: "/category/post-slug"
+    const slug = searchParams.get("slug");
 
     if (!slug) {
       return NextResponse.json(
@@ -21,7 +24,7 @@ export async function GET(request) {
     }
 
     const resp = await analyticsDataClient.runReport({
-      property: "properties/498352741",
+      property: `properties/${process.env.GA_PROPERTY_ID}`,
       dateRanges: [{ startDate: "today", endDate: "today" }],
       dimensions: [{ name: "pagePath" }],
       metrics: [{ name: "screenPageViews" }],
@@ -36,6 +39,7 @@ export async function GET(request) {
     const views = Number(resp.rows?.[0]?.metricValues?.[0]?.value || 0);
     return NextResponse.json({ views });
   } catch (err) {
+    console.error("Error fetching views:", err);
     return NextResponse.json(
       { error: "Failed to fetch views" },
       { status: 500 }
