@@ -17,6 +17,7 @@ import { uploadImage } from "@/lib/imageService";
 import TipTap from "@/components/TipTap";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import { saveNewsArticle } from "@/lib/saveNews";
 
 const categories = [
   { href: "/desh-videsh", label: "देश-विदेश" },

@@ -1,5 +1,4 @@
 "use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -68,18 +67,19 @@ export default function HomePage() {
             </h2>
           </Link>
 
-          {item.image_url && (
-            <div className="mb-4">
-              <Image
-                src={item.image_url}
-                alt={item.title}
-                width={400}
-                height={200}
-                className="rounded-lg object-contain"
-              />
-            </div>
-          )}
-
+          {item.image_url &&
+            typeof item.image_url === "string" &&
+            item.image_url.startsWith("http") && (
+              <div className="mb-4">
+                <Image
+                  src={item.image_url}
+                  alt={item.title}
+                  width={400}
+                  height={200}
+                  className="rounded-lg object-contain"
+                />
+              </div>
+            )}
           {item.content && (
             <div
               className="text-gray-700 leading-relaxed whitespace-pre-line"
@@ -92,5 +92,4 @@ export default function HomePage() {
       ))}
     </main>
   );
-};
-
+}

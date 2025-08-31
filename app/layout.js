@@ -4,7 +4,6 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Script from "next/script";
 import { GA_TRACKING_ID } from "@/lib/gtag";
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

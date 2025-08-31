@@ -4,8 +4,10 @@ import { fetchNewsBySlugAndCategory } from "@/lib/newsService";
 import NewsAnalytics from "@/components/NewsAnalytics";
 import ViewsCounter from "@/components/ViewsCounter";
 
-export default async function Page({ params }) {
-  const { slug } = await params;
+export const dynamic = "force-dynamic";
+
+export default async function JeevanKeRangDetailPage({ params }) {
+  const { slug } = params;
   const safeSlug = decodeURIComponent(slug);
 
   const news = await fetchNewsBySlugAndCategory(safeSlug, "जीवन के रंग");
@@ -22,6 +24,16 @@ export default async function Page({ params }) {
       minute: "2-digit",
     });
   };
+
+  const hasValidImage =
+    news.images &&
+    Array.isArray(news.images) &&
+    typeof news.images[0] === "string" &&
+    news.images[0].trim().length > 0;
+
+  const content = news.content_parts
+    ? news.content_parts.join("")
+    : news.content;
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -41,16 +53,16 @@ export default async function Page({ params }) {
               <span className="mr-1">🕐</span>
               {formatDate(news.created_at)}
             </div>
-            <ViewsCounter slug={`/jeewan-ke-rang/${safeSlug}`} />
+            <ViewsCounter slug={`/jeevan-ke-rang/${safeSlug}`} />
           </div>
-          {news.image_url && (
+          {hasValidImage && (
             <div className="mb-6">
-              <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden">
+              <div className="relative w-full h-96 rounded-lg overflow-hidden">
                 <Image
-                  src={news.image_url.trimEnd()}
-                  alt={news.title}
+                  src={news.images[0].trimEnd()}
+                  alt={`${news.title || "Image"}`}
                   fill
-                  className="object-contain"
+                  className="object-cover"
                   priority
                 />
               </div>
@@ -63,7 +75,12 @@ export default async function Page({ params }) {
           )}
           <div
             className="text-gray-800 leading-relaxed text-base md:text-lg"
-            dangerouslySetInnerHTML={{ __html: news.content }}
+            dangerouslySetInnerHTML={{
+              __html:
+                (news.content_parts
+                  ? news.content_parts.join("")
+                  : news.content) || "",
+            }}
           />
         </div>
       </div>

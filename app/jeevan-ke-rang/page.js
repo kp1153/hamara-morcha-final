@@ -3,11 +3,23 @@ import Link from "next/link";
 import Image from "next/image";
 import { getNewsByCategory } from "@/lib/newsService";
 
-export default async function JeevanKeRangPage() {
-  const posts = await getNewsByCategory("जीवन के रंग");
+export default async function JeewanKeRangPage() {
+  const posts = await getNewsByCategory("जीवन के रंग"); // ✅ Match with actual category title
+
+  if (!Array.isArray(posts) || posts.length === 0) {
+    return (
+      <main className="max-w-3xl mx-auto p-4 text-center">
+        <h1 className="text-2xl font-bold text-gray-800 mt-10">
+          इस श्रेणी में कोई खबर उपलब्ध नहीं है।
+        </h1>
+      </main>
+    );
+  }
 
   return (
     <main className="max-w-3xl mx-auto p-4">
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">जीवन के रंग</h1>
+
       <ul className="space-y-4">
         {posts.map((item) => (
           <li key={item.id} className="bg-white p-4 rounded shadow">
@@ -17,8 +29,7 @@ export default async function JeevanKeRangPage() {
               </h2>
             </Link>
 
-            {/* ✅ Fixed image display */}
-            {item.images && item.images.length > 0 && (
+            {item.images?.[0] && typeof item.images[0] === "string" && (
               <div className="my-3">
                 <Image
                   src={item.images[0]}
@@ -27,7 +38,6 @@ export default async function JeevanKeRangPage() {
                   height={300}
                   className="rounded-lg object-contain w-full"
                 />
-                {/* ✅ Caption only if exists */}
                 {item.caption && (
                   <p className="text-sm text-gray-600 mt-1 text-center italic">
                     {item.caption}
@@ -38,7 +48,12 @@ export default async function JeevanKeRangPage() {
 
             <div
               className="mt-2 text-blue-700"
-              dangerouslySetInnerHTML={{ __html: item.content }}
+              dangerouslySetInnerHTML={{
+                __html:
+                  (item.content_parts
+                    ? item.content_parts.join("")
+                    : item.content) || "",
+              }}
             />
           </li>
         ))}

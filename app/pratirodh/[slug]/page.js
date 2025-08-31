@@ -4,12 +4,11 @@ import { fetchNewsBySlugAndCategory } from "@/lib/newsService";
 import NewsAnalytics from "@/components/NewsAnalytics";
 import ViewsCounter from "@/components/ViewsCounter";
 
-export default async function Page({ params }) {
-  const { slug } = await params;
+export default async function PratirodhPage({ params }) {
+  const { slug } = params;
   const safeSlug = decodeURIComponent(slug);
 
   const news = await fetchNewsBySlugAndCategory(safeSlug, "प्रतिरोध");
-
   if (!news) notFound();
 
   const formatDate = (dateString) => {
@@ -42,17 +41,16 @@ export default async function Page({ params }) {
               <span className="mr-1">🕐</span>
               {formatDate(news.created_at)}
             </div>
-
             <ViewsCounter slug={`/pratirodh/${safeSlug}`} />
           </div>
-          {news.image_url && (
+          {news.images && news.images.length > 0 && (
             <div className="mb-6">
-              <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden">
+              <div className="relative w-full h-96 rounded-lg overflow-hidden">
                 <Image
-                  src={news.image_url.trimEnd()}
-                  alt={news.title}
+                  src={news.images[0].trimEnd()}
+                  alt={`${news.title || "Image"}`}
                   fill
-                  className="object-contain"
+                  className="object-cover"
                   priority
                 />
               </div>
@@ -65,7 +63,12 @@ export default async function Page({ params }) {
           )}
           <div
             className="text-gray-800 leading-relaxed text-base md:text-lg"
-            dangerouslySetInnerHTML={{ __html: news.content }}
+            dangerouslySetInnerHTML={{
+              __html:
+                (news.content_parts
+                  ? news.content_parts.join("")
+                  : news.content) || "",
+            }}
           />
         </div>
       </div>

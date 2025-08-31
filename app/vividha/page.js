@@ -1,4 +1,6 @@
 export const dynamic = "force-dynamic";
+
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { getNewsByCategory } from "@/lib/newsService";
@@ -17,8 +19,7 @@ export default async function VividhaPage() {
               </h2>
             </Link>
 
-            {/* ✅ Fixed image display */}
-            {item.images && item.images.length > 0 && (
+            {item.images && item.images.length > 0 && item.images[0] && (
               <div className="my-3">
                 <Image
                   src={item.images[0]}
@@ -27,7 +28,6 @@ export default async function VividhaPage() {
                   height={300}
                   className="rounded-lg object-contain w-full"
                 />
-                {/* ✅ Caption only if exists */}
                 {item.caption && (
                   <p className="text-sm text-gray-600 mt-1 text-center italic">
                     {item.caption}
@@ -35,10 +35,14 @@ export default async function VividhaPage() {
                 )}
               </div>
             )}
-
             <div
               className="mt-2 text-blue-700"
-              dangerouslySetInnerHTML={{ __html: item.content }}
+              dangerouslySetInnerHTML={{
+                __html:
+                  (item.content_parts
+                    ? item.content_parts.join("")
+                    : item.content) || "",
+              }}
             />
           </li>
         ))}

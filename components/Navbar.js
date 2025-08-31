@@ -14,10 +14,36 @@ const navLinks = [
 
 const Navbar = () => {
   const pathname = usePathname();
+  const whatsappNumber = "919996865069";
+  const whatsappLink = `https://wa.me/${whatsappNumber}`;
 
   return (
     <nav className="bg-white border-b-2 border-orange-200 shadow-md sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 py-4">
+        {/* ✅ सबसे ऊपर की पंक्ति: संपर्क जानकारी */}
+        <div className="flex justify-end items-center mb-2">
+          <div className="flex items-center space-x-4 text-gray-700 text-sm">
+            <span className="font-bold text-emerald-700 mr-auto">
+              वेबसाइट-मोबाइल ऐप बनवाने के लिए संपर्क करें, डोमेन-होस्टिंग दोनों
+              फ्री
+            </span>
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center hover:text-green-600 transition-colors duration-300"
+            >
+              <svg
+                viewBox="0 0 32 32"
+                className="w-5 h-5 mr-1 fill-current text-green-500"
+              >
+                <path d="M19.11 17.205c-.372 1.147-1.087 2.214-2.061 3.079..."></path>
+              </svg>
+              9996865069
+            </a>
+          </div>
+        </div>
+
         {/* Site Title */}
         <Link href="/" className="flex flex-col items-center mb-4 group">
           <h1 className="text-pink-700 text-4xl font-bold tracking-wide hover:text-red-600 transition-colors duration-300">
